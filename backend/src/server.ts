@@ -1,16 +1,18 @@
 import * as https from "https";
 import * as ws from "ws";
 import * as fs from "fs";
+import * as path from "path";
+import { fileURLToPath } from "bun";
 
 const PORT = process.env.PORT || 8080;
 
+const dirname = fileURLToPath(path.dirname(import.meta.url));
 const serverOptions = {
-  cert: fs.readFileSync("/../server.crt"),
-  key: fs.readFileSync("/../key.pem"),
+  cert: fs.readFileSync(path.join(dirname, "/../server.crt")),
+  key: fs.readFileSync(path.join(dirname, "/../key.pem")),
 };
 
 const server = https.createServer(serverOptions);
-
 const wss = new ws.WebSocketServer({ noServer: true });
 
 server.on("upgrade", (req, socket, head) => {
@@ -20,7 +22,17 @@ server.on("upgrade", (req, socket, head) => {
   }
 
   wss.handleUpgrade(req, socket, head, (ws) => {
-    
+    ws.on("message", () => {
+      // handle on message event
+    });
+
+    ws.on("error", () => {
+      // handle on message event
+    });
+
+    ws.on("close", () => {
+      // handle on message event
+    });
   });
 });
 
