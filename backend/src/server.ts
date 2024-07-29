@@ -8,8 +8,8 @@ const PORT = process.env.PORT || 8080;
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 const serverOptions = {
-  cert: fs.readFileSync(path.join(__dirname, "/../server.crt")),
-  key: fs.readFileSync(path.join(__dirname, "/../key.pem")),
+  cert: fs.readFileSync(path.join(__dirname, "/../certs/server.crt")),
+  key: fs.readFileSync(path.join(__dirname, "/../certs/key.pem")),
 };
 
 const server = https.createServer(serverOptions);
