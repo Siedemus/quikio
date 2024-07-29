@@ -2,13 +2,16 @@
   "name": "quikio-backend",
   "module": "index.ts",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "drizzle-kit": "^0.23.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "type": "module",
   "dependencies": {
+    "@neondatabase/serverless": "^0.9.4",
+    "drizzle-orm": "^0.32.1",
     "ws": "^8.18.0"
   }
 }
