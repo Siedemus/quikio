@@ -1,4 +1,4 @@
-type Message = {
+export type Message = {
   id: number;
   content: string;
   createdAt: Date;
@@ -6,28 +6,28 @@ type Message = {
   userId: number;
 };
 
-type RoomBase = {
+export type RoomBase = {
   id: number;
   name: string;
 };
 
-type SubscribedRoom = RoomBase & {
+export type SubscribedRoom = RoomBase & {
   subscribed: true;
   messageHistory: Message[];
 };
 
-type UnsubscribedRoom = RoomBase & {
+export type UnsubscribedRoom = RoomBase & {
   subscribed: false;
 };
 
-type Room = SubscribedRoom | UnsubscribedRoom;
+export type Room = SubscribedRoom | UnsubscribedRoom;
 
-type OnlineUser = {
+export type OnlineUser = {
   id: number;
   username: string;
 };
 
-type AuthorizationMessage = {
+export type AuthorizationMessage = {
   event: "authorization";
   payload: {
     username: string;
@@ -35,7 +35,7 @@ type AuthorizationMessage = {
   };
 };
 
-type AuthorizedMessage = {
+export type AuthorizedMessage = {
   event: "authorized";
   payload: {
     token: string;
@@ -44,7 +44,7 @@ type AuthorizedMessage = {
   };
 };
 
-type ErrorMessage = {
+export type ErrorMessage = {
   event: "error";
   payload: {
     code: number;
