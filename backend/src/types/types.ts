@@ -6,21 +6,17 @@ export type Message = {
   userId: number;
 };
 
-export type RoomBase = {
-  id: number;
+export type Room = {
   name: string;
+  roomId: number;
+  messages?: {
+    id: number;
+    userId: number;
+    roomId: number;
+    content: string;
+    createdAt: Date;
+  }[];
 };
-
-export type SubscribedRoom = RoomBase & {
-  subscribed: true;
-  messageHistory: Message[];
-};
-
-export type UnsubscribedRoom = RoomBase & {
-  subscribed: false;
-};
-
-export type Room = SubscribedRoom | UnsubscribedRoom;
 
 export type OnlineUser = {
   id: number;
