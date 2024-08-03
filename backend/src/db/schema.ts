@@ -11,7 +11,7 @@ import {
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 20 }).unique().notNull(),
-  password: varchar("password", { length: 35 }).notNull(),
+  password: varchar("password").notNull(),
   isOnline: boolean("isOnline").notNull(),
 });
 
