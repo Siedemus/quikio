@@ -1,0 +1,19 @@
+export const errorCodes = {
+  VALIDATION_ERROR: {
+    code: 100,
+    content:
+      "Validation failed: Username or password does not meet the required criteria.",
+  },
+  DATABASE_ERROR: {
+    code: 101,
+    content: "A database error occurred while processing the request.",
+  },
+  PASSWORD_MISMATCH_ERROR: {
+    code: 102,
+    content: "Password does not match the expected value.",
+  },
+  WRONG_MESSAGE_EVENT_ERROR: {
+    code: 103,
+    content: "An unexpected message event was received.",
+  },
+};
