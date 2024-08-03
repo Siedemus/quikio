@@ -3,6 +3,8 @@ import * as ws from "ws";
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "bun";
+import { handleMessage } from "./handlers/handleMessage";
+import { JSONToMessage } from "./utils/JSONToMessage";
 
 const PORT = process.env.PORT || 8080;
 
@@ -22,8 +24,8 @@ server.on("upgrade", (req, socket, head) => {
   }
 
   wss.handleUpgrade(req, socket, head, (ws) => {
-    ws.on("message", () => {
-      // handle on message event
+    ws.on("message", (data) => {
+      handleMessage(JSONToMessage(data.toString()), ws);
     });
 
     ws.on("error", () => {
