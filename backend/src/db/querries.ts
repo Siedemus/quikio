@@ -3,7 +3,9 @@ import { messages, rooms, userRoomSubscriptions, users } from "./schema";
 import { eq, ne } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
-export const getUserByUsername = async (username: string) => {
+// USER QUERRIES
+
+export const getUserByName = async (name: string) => {
   const user = await db
     .select({
       id: users.id,
@@ -11,7 +13,20 @@ export const getUserByUsername = async (username: string) => {
       password: users.password,
     })
     .from(users)
-    .where(eq(users.name, username));
+    .where(eq(users.name, name));
+
+  return user.length > 0 ? user[0] : null;
+};
+
+export const getUserById = async (id: number) => {
+  const user = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      password: users.password,
+    })
+    .from(users)
+    .where(eq(users.id, id));
 
   return user.length > 0 ? user[0] : null;
 };
@@ -24,6 +39,18 @@ export const createUser = async (name: string, password: string) => {
     .returning({ id: users.id, name: users.name, password: users.password });
   return user[0];
 };
+
+export const getOnlineUsers = async () => {
+  return await db
+    .select({
+      id: users.id,
+      username: users.name,
+    })
+    .from(users)
+    .where(eq(users.isOnline, true));
+};
+
+// ROOMS QUERRIES
 
 export const getSubscribedRooms = async (userId: number) => {
   return await db
@@ -51,15 +78,7 @@ export const getNotSubscribedRooms = async (userId: number) => {
     .innerJoin(rooms, eq(userRoomSubscriptions.roomId, rooms.id));
 };
 
-export const getOnlineUsers = async () => {
-  return await db
-    .select({
-      id: users.id,
-      username: users.name,
-    })
-    .from(users)
-    .where(eq(users.isOnline, true));
-};
+// MESSAGES QUERRIES
 
 export const pushMessage = async (message: {
   userId: number;
