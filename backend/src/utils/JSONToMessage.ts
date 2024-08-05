@@ -1,6 +1,6 @@
-import type { AuthorizationMessage } from "../types/types";
+import type { ClientEvents } from "../types/types";
 
 export const JSONToMessage = (data: string) => {
-  const parsedMessage: AuthorizationMessage = JSON.parse(data);
+  const parsedMessage: ClientEvents = JSON.parse(data);
   return parsedMessage;
 };

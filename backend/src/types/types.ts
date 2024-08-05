@@ -25,7 +25,7 @@ export type OnlineUser = {
   username: string;
 };
 
-export type AuthorizationMessage = {
+export type AuthorizationEvent = {
   event: "authorization";
   payload: {
     username: string;
@@ -33,7 +33,7 @@ export type AuthorizationMessage = {
   };
 };
 
-export type AuthorizedMessage = {
+export type AuthorizedEvent = {
   event: "authorized";
   payload: {
     token: string;
@@ -42,7 +42,7 @@ export type AuthorizedMessage = {
   };
 };
 
-export type ErrorMessage = {
+export type ErrorEvent = {
   event: "error";
   payload: {
     code: number;
@@ -50,7 +50,7 @@ export type ErrorMessage = {
   };
 };
 
-export type BaseMessage = {
+export type BaseMessageEvent = {
   event: "base";
   payload: {
     content: string;
@@ -59,8 +59,8 @@ export type BaseMessage = {
   };
 };
 
-export type NewMessage = {
-  event: "newMessage";
+export type NewMessageEvent = {
+  event: "NewMessageEvent";
   payload: {
     userId: number;
     roomId: number;
@@ -68,9 +68,9 @@ export type NewMessage = {
   };
 };
 
-export type ClientMessages = AuthorizationMessage | BaseMessage;
+export type ClientEvents = AuthorizationEvent | BaseMessageEvent;
 
-export type ServerMessages = ErrorMessage | AuthorizedMessage | NewMessage;
+export type ServerEvents = ErrorEvent | AuthorizedEvent | NewMessageEvent;
 export interface DecodedToken extends JwtPayload {
   id: string;
   username: string;
