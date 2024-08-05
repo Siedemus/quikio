@@ -60,3 +60,26 @@ export const getOnlineUsers = async () => {
     .from(users)
     .where(eq(users.isOnline, true));
 };
+
+export const pushMessage = async (message: {
+  userId: number;
+  roomId: number;
+  content: string;
+}) => {
+  const { userId, roomId, content } = message;
+  const NewMessageEvent = await db
+    .insert(messages)
+    .values({
+      userId,
+      roomId,
+      content,
+    })
+    .returning({
+      id: messages.id,
+      content: messages.content,
+      createdAt: messages.createdAt,
+      userId: messages.userId,
+      roomId: messages.roomId,
+    });
+  return NewMessageEvent[0];
+};

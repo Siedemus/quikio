@@ -16,4 +16,8 @@ export const errorCodes = {
     code: 103,
     content: "An unexpected message event was received.",
   },
+  EXPIRED_TOKEN: {
+    code: 104,
+    content: "Your token is probably expired.",
+  },
 };

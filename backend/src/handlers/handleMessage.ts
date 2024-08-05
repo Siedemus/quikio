@@ -1,6 +1,9 @@
-import type { AuthorizationMessage, Room } from "../types/types";
 import * as ws from "ws";
 import regex from "../utils/regex";
+import jwt, { type JwtPayload } from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import type { ClientEvents, Room } from "../types/types";
+import { messageToJSON } from "../utils/messageToJSON";
 import { sendErrorMessage } from "../utils/sendErrorMessage";
 import {
   createUser,
@@ -9,13 +12,13 @@ import {
   getUserByUsername,
   getSubscribedRooms,
   getNotSubscribedRooms,
+  pushMessage,
 } from "../db/querries";
-import { messageToJSON } from "../utils/messageToJSON";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+
+const onlineWebSockets: { id: number; name: string; ws: ws.WebSocket }[] = [];
 
 export const handleMessage = async (
-  message: AuthorizationMessage,
+  message: ClientEvents,
   ws: ws.WebSocket
 ) => {
   switch (message.event) {
@@ -26,7 +29,9 @@ export const handleMessage = async (
       }
 
       handleAuthorization(ws, message.payload);
-
+      break;
+    case "base":
+      handleBaseMessageEvent(ws, message.payload);
       break;
     default:
       sendErrorMessage(ws, "WRONG_MESSAGE_EVENT_ERROR");
@@ -49,7 +54,7 @@ const handleAuthorization = async (
       user = await createUser(inputUser.username, inputUser.password);
     }
 
-    const token = generateToken(user.name);
+    const token = generateToken(user.name, user.id);
     const rooms = await createRooms(user);
     const onlineUsers = await getOnlineUsers();
 
@@ -59,8 +64,51 @@ const handleAuthorization = async (
         payload: { token, rooms, onlineUsers },
       })
     );
+    onlineWebSockets.push({ id: user.id, name: user.name, ws: ws });
   } catch {
     sendErrorMessage(ws, "DATABASE_ERROR");
+  }
+};
+
+const handleBaseMessageEvent = async (
+  ws: ws.WebSocket,
+  message: {
+    content: string;
+    token: string;
+    roomId: number;
+  }
+) => {
+  const decoded = decodeToken(message.token);
+
+  if (decoded) {
+    try {
+      const NewMessageEvent = await pushMessage({
+        userId: decoded.id,
+        roomId: message.roomId,
+        content: message.content,
+      });
+
+      for (const onlineWebSocket of onlineWebSockets) {
+        const subscribedRooms = await getSubscribedRooms(onlineWebSocket.id);
+
+        if (
+          subscribedRooms.some(
+            (subscribedRoom) => subscribedRoom.roomId === NewMessageEvent.roomId
+          )
+        ) {
+          onlineWebSocket.ws.send(
+            messageToJSON({
+              event: "NewMessageEvent",
+              payload: NewMessageEvent,
+            })
+          );
+        }
+      }
+    } catch {
+      sendErrorMessage(ws, "DATABASE_ERROR");
+    }
+  } else {
+    sendErrorMessage(ws, "EXPIRED_TOKEN");
   }
 };
 
@@ -81,8 +129,8 @@ const isPasswordMatch = async (
   return bcrypt.compare(inputPassword, storedPassword);
 };
 
-const generateToken = (username: string) => {
-  return jwt.sign({ username }, process.env.JWT_TOKEN_KEY!, {
+const generateToken = (username: string, id: number) => {
+  return jwt.sign({ username, id }, process.env.JWT_TOKEN_KEY!, {
     expiresIn: "6h",
   });
 };
@@ -110,4 +158,13 @@ const createRooms = async (user: {
   }
 
   return rooms;
+};
+
+const decodeToken = (token: string) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_TOKEN_KEY!) as JwtPayload;
+    return { id: decoded.id, username: decoded.username };
+  } catch {
+    return null;
+  }
 };
