@@ -1,4 +1,8 @@
 export const errorCodes = {
+  PARSING_ERROR: {
+    code: 99,
+    content: "Something went wrong during message parsing.",
+  },
   VALIDATION_ERROR: {
     code: 100,
     content:
