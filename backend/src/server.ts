@@ -5,6 +5,7 @@ import * as path from "path";
 import { fileURLToPath } from "bun";
 import { handleMessage } from "./handlers/handleMessage";
 import { JSONToMessage } from "./utils/JSONToMessage";
+import { sendErrorMessage } from "./utils/sendErrorMessage";
 
 const PORT = process.env.PORT || 8080;
 
@@ -25,7 +26,12 @@ server.on("upgrade", (req, socket, head) => {
 
   wss.handleUpgrade(req, socket, head, (ws) => {
     ws.on("message", (data) => {
-      handleMessage(JSONToMessage(data.toString()), ws);
+      try {
+        const message = JSONToMessage(data.toString());
+        handleMessage(message, ws);
+      } catch {
+        sendErrorMessage(ws, "PARSING_ERROR");
+      }
     });
 
     ws.on("error", () => {
