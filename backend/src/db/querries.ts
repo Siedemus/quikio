@@ -6,27 +6,13 @@ import bcrypt from "bcrypt";
 // USER QUERRIES
 
 export const getUserByName = async (name: string) => {
-  const user = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      password: users.password,
-    })
-    .from(users)
-    .where(eq(users.name, name));
+  const user = await db.select().from(users).where(eq(users.name, name));
 
   return user.length > 0 ? user[0] : null;
 };
 
 export const getUserById = async (id: number) => {
-  const user = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      password: users.password,
-    })
-    .from(users)
-    .where(eq(users.id, id));
+  const user = await db.select().from(users).where(eq(users.id, id));
 
   return user.length > 0 ? user[0] : null;
 };
@@ -36,15 +22,15 @@ export const createUser = async (name: string, password: string) => {
   const user = await db
     .insert(users)
     .values({ name, password: hashedPassword, isOnline: false })
-    .returning({ id: users.id, name: users.name, password: users.password });
+    .returning();
   return user[0];
 };
 
 export const getOnlineUsers = async () => {
-  return await db
+  return db
     .select({
       id: users.id,
-      username: users.name,
+      name: users.name,
     })
     .from(users)
     .where(eq(users.isOnline, true));
@@ -56,7 +42,7 @@ export const getSubscribedRooms = async (userId: number) => {
   return await db
     .select({
       name: rooms.name,
-      roomId: userRoomSubscriptions.roomId,
+      id: userRoomSubscriptions.roomId,
     })
     .from(userRoomSubscriptions)
     .where(eq(userRoomSubscriptions.userId, userId))
@@ -71,7 +57,7 @@ export const getNotSubscribedRooms = async (userId: number) => {
   return await db
     .select({
       name: rooms.name,
-      roomId: userRoomSubscriptions.roomId,
+      id: userRoomSubscriptions.roomId,
     })
     .from(userRoomSubscriptions)
     .where(ne(userRoomSubscriptions.userId, userId))
@@ -93,12 +79,6 @@ export const pushMessage = async (message: {
       roomId,
       content,
     })
-    .returning({
-      id: messages.id,
-      content: messages.content,
-      createdAt: messages.createdAt,
-      userId: messages.userId,
-      roomId: messages.roomId,
-    });
+    .returning();
   return NewMessageEvent[0];
 };

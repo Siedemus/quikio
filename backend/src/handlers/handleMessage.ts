@@ -9,7 +9,7 @@ import {
   createUser,
   getOnlineUsers,
   getRoomMessages,
-  getUserByUsername,
+  getUserByName,
   getSubscribedRooms,
   getNotSubscribedRooms,
   pushMessage,
@@ -40,18 +40,18 @@ export const handleMessage = async (
 
 const handleAuthorization = async (
   ws: ws.WebSocket,
-  inputUser: { username: string; password: string }
+  inputUser: { name: string; password: string }
 ) => {
   let user;
   try {
-    user = await getUserByUsername(inputUser.username);
+    user = await getUserByName(inputUser.name);
     if (user) {
       if (!isPasswordMatch(user.password, inputUser.password)) {
         sendErrorMessage(ws, "PASSWORD_MISMATCH_ERROR");
         return;
       }
     } else {
-      user = await createUser(inputUser.username, inputUser.password);
+      user = await createUser(inputUser.name, inputUser.password);
     }
 
     const token = generateToken(user.name, user.id);
@@ -75,16 +75,16 @@ const handleBaseMessageEvent = async (
   message: {
     content: string;
     token: string;
-    roomId: number;
+    id: number;
   }
 ) => {
-  const decoded = decodeToken(message.token);
+  const decodedToken = decodeToken(message.token);
 
-  if (decoded) {
+  if (decodedToken) {
     try {
       const NewMessageEvent = await pushMessage({
-        userId: decoded.id,
-        roomId: message.roomId,
+        userId: decodedToken.id,
+        roomId: message.id,
         content: message.content,
       });
 
@@ -93,7 +93,7 @@ const handleBaseMessageEvent = async (
 
         if (
           subscribedRooms.some(
-            (subscribedRoom) => subscribedRoom.roomId === NewMessageEvent.roomId
+            (subscribedRoom) => subscribedRoom.id === NewMessageEvent.roomId
           )
         ) {
           onlineWebSocket.ws.send(
@@ -112,12 +112,12 @@ const handleBaseMessageEvent = async (
   }
 };
 
-const validateUserData = (user: { password: string; username: string }) => {
+const validateUserData = (user: { password: string; name: string }) => {
   const trimmedPassword = user.password.trim();
-  const trimmedUsername = user.username.trim();
+  const trimmedName = user.name.trim();
 
   return (
-    regex.usernameRegex.test(trimmedUsername) &&
+    regex.usernameRegex.test(trimmedName) &&
     regex.passwordRegex.test(trimmedPassword)
   );
 };
@@ -145,10 +145,10 @@ const createRooms = async (user: {
   const notSubscribedRooms = await getNotSubscribedRooms(user.id);
 
   for (const subscribedRoom of subscribedRooms) {
-    const messages = await getRoomMessages(subscribedRoom.roomId);
+    const messages = await getRoomMessages(subscribedRoom.id);
     rooms.push({
       name: subscribedRoom.name,
-      roomId: subscribedRoom.roomId,
+      id: subscribedRoom.id,
       messages,
     });
   }

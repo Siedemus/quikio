@@ -10,7 +10,7 @@ export type Message = {
 
 export type Room = {
   name: string;
-  roomId: number;
+  id: number;
   messages?: {
     id: number;
     userId: number;
@@ -22,13 +22,13 @@ export type Room = {
 
 export type OnlineUser = {
   id: number;
-  username: string;
+  name: string;
 };
 
 export type AuthorizationEvent = {
   event: "authorization";
   payload: {
-    username: string;
+    name: string;
     password: string;
   };
 };
@@ -54,7 +54,7 @@ export type BaseMessageEvent = {
   event: "base";
   payload: {
     content: string;
-    roomId: number;
+    id: number;
     token: string;
   };
 };
