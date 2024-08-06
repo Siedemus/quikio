@@ -7,7 +7,6 @@ import { messageToJSON } from "../utils/messageToJSON";
 import { sendErrorMessage } from "../utils/sendErrorMessage";
 import {
   createUser,
-  getOnlineUsers,
   getRoomMessages,
   getUserByName,
   getSubscribedRooms,
@@ -23,7 +22,8 @@ export const handleMessage = async (
 ) => {
   switch (message.event) {
     case "authorization":
-      if (!validateUserData(message.payload)) {
+      const isValid = validateUserData(message.payload);
+      if (!isValid) {
         sendErrorMessage(ws, "VALIDATION_ERROR");
         break;
       }
@@ -42,11 +42,11 @@ const handleAuthorization = async (
   ws: ws.WebSocket,
   inputUser: { name: string; password: string }
 ) => {
-  let user;
   try {
-    user = await getUserByName(inputUser.name);
+    let user = await getUserByName(inputUser.name);
     if (user) {
-      if (!isPasswordMatch(user.password, inputUser.password)) {
+      const passwordMatch = isPasswordMatch(user.password, inputUser.password);
+      if (!passwordMatch) {
         sendErrorMessage(ws, "PASSWORD_MISMATCH_ERROR");
         return;
       }
@@ -56,7 +56,7 @@ const handleAuthorization = async (
 
     const token = generateToken(user.name, user.id);
     const rooms = await createRooms(user);
-    const onlineUsers = await getOnlineUsers();
+    const onlineUsers = []!;
 
     ws.send(
       messageToJSON({
@@ -80,35 +80,35 @@ const handleBaseMessageEvent = async (
 ) => {
   const decodedToken = decodeToken(message.token);
 
-  if (decodedToken) {
-    try {
-      const NewMessageEvent = await pushMessage({
-        userId: decodedToken.id,
-        roomId: message.id,
-        content: message.content,
-      });
-
-      for (const onlineWebSocket of onlineWebSockets) {
-        const subscribedRooms = await getSubscribedRooms(onlineWebSocket.id);
-
-        if (
-          subscribedRooms.some(
-            (subscribedRoom) => subscribedRoom.id === NewMessageEvent.roomId
-          )
-        ) {
-          onlineWebSocket.ws.send(
-            messageToJSON({
-              event: "NewMessageEvent",
-              payload: NewMessageEvent,
-            })
-          );
-        }
-      }
-    } catch {
-      sendErrorMessage(ws, "DATABASE_ERROR");
-    }
-  } else {
+  if (!decodedToken) {
     sendErrorMessage(ws, "EXPIRED_TOKEN");
+    return;
+  }
+
+  try {
+    const newMessage = await pushMessage({
+      userId: decodedToken.id,
+      roomId: message.id,
+      content: message.content,
+    });
+
+    for (const onlineWebSocket of onlineWebSockets) {
+      const subscribedRooms = await getSubscribedRooms(onlineWebSocket.id);
+      const isSubscribingToRoom = subscribedRooms.some(
+        (subscribedRoom) => subscribedRoom.id === newMessage.roomId
+      );
+
+      if (isSubscribingToRoom) {
+        onlineWebSocket.ws.send(
+          messageToJSON({
+            event: "NewMessageEvent",
+            payload: newMessage,
+          })
+        );
+      }
+    }
+  } catch {
+    sendErrorMessage(ws, "DATABASE_ERROR");
   }
 };
 
@@ -126,7 +126,7 @@ const isPasswordMatch = async (
   storedPassword: string,
   inputPassword: string
 ) => {
-  return bcrypt.compare(inputPassword, storedPassword);
+  return await bcrypt.compare(inputPassword, storedPassword);
 };
 
 const generateToken = (username: string, id: number) => {
