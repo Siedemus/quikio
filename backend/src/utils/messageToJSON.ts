@@ -1,12 +1,7 @@
 import type {
-  AuthorizationEvent,
-  AuthorizedEvent,
-  ErrorEvent,
-  NewMessageEvent,
+  ServerEvents,
 } from "../types/types";
 
-export const messageToJSON = (
-  message: AuthorizationEvent | ErrorEvent | AuthorizedEvent | NewMessageEvent
-) => {
+export const messageToJSON = (message: ServerEvents) => {
   return JSON.stringify(message);
 };
