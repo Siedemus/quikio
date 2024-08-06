@@ -1,4 +1,5 @@
 import type { JwtPayload } from "jsonwebtoken";
+import * as ws from "ws";
 
 export type Message = {
   id: number;
@@ -23,6 +24,10 @@ export type Room = {
 export type OnlineUser = {
   id: number;
   name: string;
+};
+
+export type OnlineUserSocket = OnlineUser & {
+  ws: ws.WebSocket;
 };
 
 export type AuthorizationEvent = {

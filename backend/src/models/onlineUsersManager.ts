@@ -1,15 +1,9 @@
-import * as ws from "ws";
-
-interface User {
-  id: number;
-  name: string;
-  ws: ws.WebSocket;
-}
+import type { OnlineUserSocket } from "../types/types";
 
 class OnlineUsersManager {
-  private onlineUsers: User[] = [];
+  private onlineUsers: OnlineUserSocket[] = [];
 
-  addUser(user: User): void {
+  addUser(user: OnlineUserSocket): void {
     this.onlineUsers.push(user);
   }
 
@@ -17,11 +11,11 @@ class OnlineUsersManager {
     this.onlineUsers = this.onlineUsers.filter((user) => user.id !== userId);
   }
 
-  getUser(userId: number): User | undefined {
+  getUser(userId: number): OnlineUserSocket | undefined {
     return this.onlineUsers.find((user) => user.id === userId);
   }
 
-  getUsers(): User[] {
+  getUsers(): OnlineUserSocket[] {
     return this.onlineUsers;
   }
 }
