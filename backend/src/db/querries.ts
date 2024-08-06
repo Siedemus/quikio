@@ -54,6 +54,17 @@ export const getNotSubscribedRooms = async (userId: number) => {
     .innerJoin(rooms, eq(userRoomSubscriptions.roomId, rooms.id));
 };
 
+export const getRooms = async () => {
+  return await db.select().from(rooms);
+};
+
+export const subscribeToRoom = async (userSubscription: {
+  userId: number;
+  roomId: number;
+}) => {
+  return await db.insert(userRoomSubscriptions).values(userSubscription);
+};
+
 // MESSAGES QUERRIES
 
 export const pushMessage = async (message: {

@@ -24,4 +24,13 @@ export const errorCodes = {
     code: 104,
     content: "Your token is probably expired.",
   },
+  ALREADY_SUBSCRIBING: {
+    code: 105,
+    content: "You are already subscribing to this room.",
+  },
+  ROOM_DOESNT_EXIST: {
+    code: 106,
+    content: "Room doesnt exist.",
+  },
+  
 };

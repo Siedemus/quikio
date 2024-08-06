@@ -12,6 +12,9 @@ import {
   getSubscribedRooms,
   getNotSubscribedRooms,
   pushMessage,
+  getRooms,
+  subscribeToRoom,
+  getUserById,
 } from "../db/querries";
 import onlineUsersManager from "../models/onlineUsersManager";
 
@@ -32,6 +35,10 @@ export const handleMessage = async (
     case "base":
       handleBaseMessageEvent(ws, message.payload);
       break;
+    case "subscribeRoom":
+      handleRoomSubscription(ws, message.payload);
+      break;
+    case "unsubscribeRoom":
     default:
       sendErrorMessage(ws, "WRONG_MESSAGE_EVENT_ERROR");
   }
@@ -117,6 +124,41 @@ const handleBaseMessageEvent = async (
   }
 };
 
+const handleRoomSubscription = async (
+  ws: ws.WebSocket,
+  message: { token: string; id: number }
+) => {
+  const decodedToken = decodeToken(message.token);
+
+  if (!decodedToken) {
+    sendErrorMessage(ws, "EXPIRED_TOKEN");
+    return;
+  }
+
+  try {
+    if (!(await roomExists(message.id, ws))) {
+      sendErrorMessage(ws, "ROOM_DOESNT_EXIST");
+      return;
+    }
+
+    if (!(await isSubscribing(message.id, decodedToken.id))) {
+      sendErrorMessage(ws, "ALREADY_SUBSCRIBING");
+      return;
+    }
+
+    await subscribeToRoom({ userId: decodedToken.id, roomId: message.id });
+
+    const user = onlineUsersManager.getUser(decodedToken.id);
+    if (!user) return;
+
+    const room = await createRoom(message.id);
+
+    user.ws.send(messageToJSON({ event: "addRoom", payload: { room } }));
+  } catch {
+    sendErrorMessage(ws, "DATABASE_ERROR");
+  }
+};
+
 const validateUserData = (user: { password: string; name: string }) => {
   const trimmedPassword = user.password.trim();
   const trimmedName = user.name.trim();
@@ -181,4 +223,24 @@ const decodeToken = (token: string) => {
   } catch {
     return null;
   }
+};
+
+const roomExists = async (id: number, ws: ws.WebSocket) => {
+  const rooms = await getRooms();
+  return rooms.some((room) => room.id === id);
+};
+
+const isSubscribing = async (roomId: number, userId: number) => {
+  const userSubscribitons = await getSubscribedRooms(userId);
+  return userSubscribitons.some((subscribiton) => subscribiton.id === roomId);
+};
+
+const createRoom = async (roomId: number) => {
+  const { id, name } = (await getRooms()).find((room) => room.id === roomId)!;
+  const roomMessages = await getRoomMessages(id);
+  return {
+    id,
+    name,
+    roomMessages,
+  };
 };
