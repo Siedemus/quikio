@@ -81,13 +81,49 @@ export type NewOnlineUserEvent = {
   };
 };
 
-export type ClientEvents = AuthorizationEvent | BaseMessageEvent;
+export type SubscribeRoomEvent = {
+  event: "subscribeRoom";
+  payload: {
+    token: string;
+    id: number;
+  };
+};
+
+export type UnsubscribeRoomEvent = {
+  event: "unsubscribeRoom";
+  payload: {
+    token: string;
+    id: number;
+  };
+};
+
+export type addRoomEvent = {
+  event: "addRoom";
+  payload: {
+    room: Room;
+  };
+};
+
+export type RemoveRoomEvent = {
+  event: "removeEvent";
+  payload: {
+    id: number;
+  };
+};
+
+export type ClientEvents =
+  | AuthorizationEvent
+  | BaseMessageEvent
+  | SubscribeRoomEvent
+  | UnsubscribeRoomEvent;
 
 export type ServerEvents =
   | ErrorEvent
   | AuthorizedEvent
   | NewMessageEvent
-  | NewOnlineUserEvent;
+  | NewOnlineUserEvent
+  | addRoomEvent
+  | RemoveRoomEvent;
 export interface DecodedToken extends JwtPayload {
   id: string;
   name: string;
