@@ -68,9 +68,21 @@ export type NewMessageEvent = {
   };
 };
 
+export type NewOnlineUserEvent = {
+  event: "newOnlineUser";
+  payload: {
+    id: number;
+    name: string;
+  };
+};
+
 export type ClientEvents = AuthorizationEvent | BaseMessageEvent;
 
-export type ServerEvents = ErrorEvent | AuthorizedEvent | NewMessageEvent;
+export type ServerEvents =
+  | ErrorEvent
+  | AuthorizedEvent
+  | NewMessageEvent
+  | NewOnlineUserEvent;
 export interface DecodedToken extends JwtPayload {
   id: string;
   name: string;
