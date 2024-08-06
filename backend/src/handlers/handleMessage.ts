@@ -13,8 +13,7 @@ import {
   getNotSubscribedRooms,
   pushMessage,
 } from "../db/querries";
-
-const onlineWebSockets: { id: number; name: string; ws: ws.WebSocket }[] = [];
+import onlineUsersManager from "../models/onlineUsersManager";
 
 export const handleMessage = async (
   message: ClientEvents,
@@ -56,15 +55,25 @@ const handleAuthorization = async (
 
     const token = generateToken(user.name, user.id);
     const rooms = await createRooms(user);
-    const onlineUsers = []!;
+    const onlineUsers = onlineUsersManager.getUsers();
+    const formattedOnlineUsers = onlineUsers.map(({ id, name }) => ({
+      id,
+      name,
+    }));
 
     ws.send(
       messageToJSON({
         event: "authorized",
-        payload: { token, rooms, onlineUsers },
+        payload: { token, rooms, onlineUsers: formattedOnlineUsers },
       })
     );
-    onlineWebSockets.push({ id: user.id, name: user.name, ws: ws });
+
+    for (const onlineUser of onlineUsers) {
+      const { id, name } = onlineUser;
+      onlineUser.ws.send(
+        messageToJSON({ event: "newOnlineUser", payload: { id, name } })
+      );
+    }
   } catch {
     sendErrorMessage(ws, "DATABASE_ERROR");
   }
@@ -91,15 +100,16 @@ const handleBaseMessageEvent = async (
       roomId: message.id,
       content: message.content,
     });
+    const onlineUsers = onlineUsersManager.getUsers();
 
-    for (const onlineWebSocket of onlineWebSockets) {
-      const subscribedRooms = await getSubscribedRooms(onlineWebSocket.id);
+    for (const user of onlineUsers) {
+      const subscribedRooms = await getSubscribedRooms(user.id);
       const isSubscribingToRoom = subscribedRooms.some(
         (subscribedRoom) => subscribedRoom.id === newMessage.roomId
       );
 
       if (isSubscribingToRoom) {
-        onlineWebSocket.ws.send(
+        user.ws.send(
           messageToJSON({
             event: "NewMessageEvent",
             payload: newMessage,
@@ -144,17 +154,17 @@ const createRooms = async (user: {
   const subscribedRooms = await getSubscribedRooms(user.id);
   const notSubscribedRooms = await getNotSubscribedRooms(user.id);
 
-  for (const subscribedRoom of subscribedRooms) {
-    const messages = await getRoomMessages(subscribedRoom.id);
+  for (const room of subscribedRooms) {
+    const messages = await getRoomMessages(room.id);
     rooms.push({
-      name: subscribedRoom.name,
-      id: subscribedRoom.id,
+      name: room.name,
+      id: room.id,
       messages,
     });
   }
 
-  for (const notSubscribedRoom of notSubscribedRooms) {
-    rooms.push(notSubscribedRoom);
+  for (const room of notSubscribedRooms) {
+    rooms.push(room);
   }
 
   return rooms;
