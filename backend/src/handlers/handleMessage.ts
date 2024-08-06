@@ -2,7 +2,7 @@ import * as ws from "ws";
 import regex from "../utils/regex";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import type { ClientEvents, Room } from "../types/types";
+import type { ClientEvents, OnlineUserSocket, Room } from "../types/types";
 import { messageToJSON } from "../utils/messageToJSON";
 import { sendErrorMessage } from "../utils/sendErrorMessage";
 import {
@@ -68,12 +68,7 @@ const handleAuthorization = async (
       })
     );
 
-    for (const onlineUser of onlineUsers) {
-      const { id, name } = onlineUser;
-      onlineUser.ws.send(
-        messageToJSON({ event: "newOnlineUser", payload: { id, name } })
-      );
-    }
+    sendNewOnlineUser(onlineUsers);
   } catch {
     sendErrorMessage(ws, "DATABASE_ERROR");
   }
@@ -168,6 +163,15 @@ const createRooms = async (user: {
   }
 
   return rooms;
+};
+
+const sendNewOnlineUser = (onlineUsers: OnlineUserSocket[]) => {
+  for (const onlineUser of onlineUsers) {
+    const { id, name } = onlineUser;
+    onlineUser.ws.send(
+      messageToJSON({ event: "newOnlineUser", payload: { id, name } })
+    );
+  }
 };
 
 const decodeToken = (token: string) => {
