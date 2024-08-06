@@ -12,7 +12,6 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 20 }).unique().notNull(),
   password: varchar("password").notNull(),
-  isOnline: boolean("isOnline").notNull(),
 });
 
 export const rooms = pgTable("rooms", {

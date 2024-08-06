@@ -21,19 +21,9 @@ export const createUser = async (name: string, password: string) => {
   const hashedPassword = await bcrypt.hash(password, process.env.SALT!);
   const user = await db
     .insert(users)
-    .values({ name, password: hashedPassword, isOnline: false })
+    .values({ name, password: hashedPassword })
     .returning();
   return user[0];
-};
-
-export const getOnlineUsers = async () => {
-  return db
-    .select({
-      id: users.id,
-      name: users.name,
-    })
-    .from(users)
-    .where(eq(users.isOnline, true));
 };
 
 // ROOMS QUERRIES
