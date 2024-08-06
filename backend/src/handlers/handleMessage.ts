@@ -129,8 +129,8 @@ const isPasswordMatch = async (
   return await bcrypt.compare(inputPassword, storedPassword);
 };
 
-const generateToken = (username: string, id: number) => {
-  return jwt.sign({ username, id }, process.env.JWT_TOKEN_KEY!, {
+const generateToken = (name: string, id: number) => {
+  return jwt.sign({ name, id }, process.env.JWT_TOKEN_KEY!, {
     expiresIn: "6h",
   });
 };
@@ -163,7 +163,7 @@ const createRooms = async (user: {
 const decodeToken = (token: string) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_TOKEN_KEY!) as JwtPayload;
-    return { id: decoded.id, username: decoded.username };
+    return { id: decoded.id, name: decoded.name };
   } catch {
     return null;
   }

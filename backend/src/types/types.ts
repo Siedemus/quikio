@@ -73,5 +73,5 @@ export type ClientEvents = AuthorizationEvent | BaseMessageEvent;
 export type ServerEvents = ErrorEvent | AuthorizedEvent | NewMessageEvent;
 export interface DecodedToken extends JwtPayload {
   id: string;
-  username: string;
+  name: string;
 }
