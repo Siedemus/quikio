@@ -32,5 +32,8 @@ export const errorCodes = {
     code: 106,
     content: "Room doesnt exist.",
   },
-  
+  ALREADY_NOT_SUBSCRIBING: {
+    code: 107,
+    content: "You are already not subscribing to this room.",
+  },
 };

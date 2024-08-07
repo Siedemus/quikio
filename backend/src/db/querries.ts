@@ -1,6 +1,6 @@
 import db from "./db";
 import { messages, rooms, userRoomSubscriptions, users } from "./schema";
-import { eq, ne } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 // USER QUERRIES
@@ -63,6 +63,20 @@ export const subscribeToRoom = async (userSubscription: {
   roomId: number;
 }) => {
   return await db.insert(userRoomSubscriptions).values(userSubscription);
+};
+
+export const unsubscribeToRoom = async (userSubscription: {
+  userId: number;
+  roomId: number;
+}) => {
+  await db
+    .delete(userRoomSubscriptions)
+    .where(
+      and(
+        eq(userRoomSubscriptions.userId, userSubscription.userId),
+        eq(userRoomSubscriptions.roomId, userSubscription.roomId)
+      )
+    );
 };
 
 // MESSAGES QUERRIES

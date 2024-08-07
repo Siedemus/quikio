@@ -14,7 +14,7 @@ import {
   pushMessage,
   getRooms,
   subscribeToRoom,
-  getUserById,
+  unsubscribeToRoom,
 } from "../db/querries";
 import onlineUsersManager from "../models/onlineUsersManager";
 
@@ -39,6 +39,9 @@ export const handleMessage = async (
       handleRoomSubscription(ws, message.payload);
       break;
     case "unsubscribeRoom":
+      handleRoomUnsubscription(ws, message.payload);
+      break;
+
     default:
       sendErrorMessage(ws, "WRONG_MESSAGE_EVENT_ERROR");
   }
@@ -141,7 +144,7 @@ const handleRoomSubscription = async (
       return;
     }
 
-    if (!(await isSubscribing(message.id, decodedToken.id))) {
+    if (await isSubscribing(message.id, decodedToken.id)) {
       sendErrorMessage(ws, "ALREADY_SUBSCRIBING");
       return;
     }
@@ -154,6 +157,41 @@ const handleRoomSubscription = async (
     const room = await createRoom(message.id);
 
     user.ws.send(messageToJSON({ event: "addRoom", payload: { room } }));
+  } catch {
+    sendErrorMessage(ws, "DATABASE_ERROR");
+  }
+};
+
+const handleRoomUnsubscription = async (
+  ws: ws.WebSocket,
+  message: { token: string; id: number }
+) => {
+  const decodedToken = decodeToken(message.token);
+
+  if (!decodedToken) {
+    sendErrorMessage(ws, "EXPIRED_TOKEN");
+    return;
+  }
+
+  try {
+    if (!(await roomExists(message.id, ws))) {
+      sendErrorMessage(ws, "ROOM_DOESNT_EXIST");
+      return;
+    }
+
+    if (!(await isSubscribing(message.id, decodedToken.id))) {
+      sendErrorMessage(ws, "ALREADY_NOT_SUBSCRIBING");
+      return;
+    }
+
+    await unsubscribeToRoom({ userId: decodedToken.id, roomId: message.id });
+
+    const user = onlineUsersManager.getUser(decodedToken.id);
+    if (!user) return;
+
+    user.ws.send(
+      messageToJSON({ event: "removeEvent", payload: { id: message.id } })
+    );
   } catch {
     sendErrorMessage(ws, "DATABASE_ERROR");
   }
