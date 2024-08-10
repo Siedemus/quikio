@@ -20,8 +20,7 @@ CREATE TABLE IF NOT EXISTS "user_room_subscriptions" (
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(20) NOT NULL,
-	"password" varchar(35) NOT NULL,
-	"isOnline" boolean NOT NULL,
+	"password" varchar NOT NULL,
 	CONSTRAINT "users_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint

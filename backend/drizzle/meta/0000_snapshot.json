@@ -1,5 +1,5 @@
 {
-  "id": "ccd2359d-e12e-4e87-8aa7-ea632b31afbc",
+  "id": "c43ee481-7410-4295-b647-a23b8990b6f4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -167,13 +167,7 @@
         },
         "password": {
           "name": "password",
-          "type": "varchar(35)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "isOnline": {
-          "name": "isOnline",
-          "type": "boolean",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         }
