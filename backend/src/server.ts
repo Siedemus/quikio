@@ -45,5 +45,5 @@ server.on("upgrade", (req, socket, head) => {
 });
 
 server.listen(PORT, () => {
-  console.log("Server is listening on port 8080");
+  console.log(`Server is listening on port ${PORT}`);
 });
