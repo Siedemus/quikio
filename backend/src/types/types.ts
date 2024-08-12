@@ -12,13 +12,7 @@ export type Message = {
 export type Room = {
   name: string;
   id: number;
-  messages?: {
-    id: number;
-    userId: number;
-    roomId: number;
-    content: string;
-    createdAt: Date;
-  }[];
+  messages?: Message[];
 };
 
 export type OnlineUser = {
@@ -66,11 +60,7 @@ export type BaseMessageEvent = {
 
 export type NewMessageEvent = {
   event: "NewMessageEvent";
-  payload: {
-    userId: number;
-    roomId: number;
-    content: string;
-  };
+  payload: Message;
 };
 
 export type NewOnlineUserEvent = {
