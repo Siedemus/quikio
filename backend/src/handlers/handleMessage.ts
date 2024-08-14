@@ -116,7 +116,7 @@ const handleBaseMessageEvent = async (
       if (isSubscribingToRoom) {
         user.ws.send(
           messageToJSON({
-            event: "NewMessageEvent",
+            event: "newMessage",
             payload: newMessage,
           })
         );
@@ -190,7 +190,7 @@ const handleRoomUnsubscription = async (
     if (!user) return;
 
     user.ws.send(
-      messageToJSON({ event: "removeEvent", payload: { id: message.id } })
+      messageToJSON({ event: "removeRoom", payload: { id: message.id } })
     );
   } catch {
     sendErrorMessage(ws, "DATABASE_ERROR");

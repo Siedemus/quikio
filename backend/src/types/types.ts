@@ -59,16 +59,13 @@ export type BaseMessageEvent = {
 };
 
 export type NewMessageEvent = {
-  event: "NewMessageEvent";
+  event: "newMessage";
   payload: Message;
 };
 
 export type NewOnlineUserEvent = {
   event: "newOnlineUser";
-  payload: {
-    id: number;
-    name: string;
-  };
+  payload: OnlineUser;
 };
 
 export type SubscribeRoomEvent = {
@@ -95,7 +92,7 @@ export type addRoomEvent = {
 };
 
 export type RemoveRoomEvent = {
-  event: "removeEvent";
+  event: "removeRoom";
   payload: {
     id: number;
   };
