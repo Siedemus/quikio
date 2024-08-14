@@ -24,38 +24,46 @@ export type OnlineUserSocket = OnlineUser & {
   ws: ws.WebSocket;
 };
 
+export type AuthorizationEventPayload = {
+  name: string;
+  password: string;
+};
+
 export type AuthorizationEvent = {
   event: "authorization";
-  payload: {
-    name: string;
-    password: string;
-  };
+  payload: AuthorizationEventPayload;
+};
+
+export type AuthorizedEventPayload = {
+  token: string;
+  rooms: Room[];
+  onlineUsers: OnlineUser[];
 };
 
 export type AuthorizedEvent = {
   event: "authorized";
-  payload: {
-    token: string;
-    rooms: Room[];
-    onlineUsers: OnlineUser[];
-  };
+  payload: AuthorizedEventPayload;
+};
+
+export type ErrorEventPayload = {
+  code: number;
+  content: string;
 };
 
 export type ErrorEvent = {
   event: "error";
-  payload: {
-    code: number;
-    content: string;
-  };
+  payload: ErrorEventPayload;
+};
+
+export type BaseMessageEventPayload = {
+  content: string;
+  id: number;
+  token: string;
 };
 
 export type BaseMessageEvent = {
   event: "base";
-  payload: {
-    content: string;
-    id: number;
-    token: string;
-  };
+  payload: BaseMessageEventPayload;
 };
 
 export type NewMessageEvent = {
@@ -68,34 +76,38 @@ export type NewOnlineUserEvent = {
   payload: OnlineUser;
 };
 
+export type SubscribeRoomEventPayload = {
+  token: string;
+  id: number;
+};
+
 export type SubscribeRoomEvent = {
   event: "subscribeRoom";
-  payload: {
-    token: string;
-    id: number;
-  };
+  payload: SubscribeRoomEventPayload;
+};
+
+export type UnsubscribeRoomEventPayload = {
+  token: string;
+  id: number;
 };
 
 export type UnsubscribeRoomEvent = {
   event: "unsubscribeRoom";
-  payload: {
-    token: string;
-    id: number;
-  };
+  payload: UnsubscribeRoomEventPayload;
 };
 
 export type addRoomEvent = {
   event: "addRoom";
-  payload: {
-    room: Room;
-  };
+  payload: Room;
+};
+
+export type RemoveRoomEventPayload = {
+  id: number;
 };
 
 export type RemoveRoomEvent = {
   event: "removeRoom";
-  payload: {
-    id: number;
-  };
+  payload: RemoveRoomEventPayload;
 };
 
 export type ClientEvents =

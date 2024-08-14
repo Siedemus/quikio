@@ -156,7 +156,7 @@ const handleRoomSubscription = async (
 
     const room = await createRoom(message.id);
 
-    user.ws.send(messageToJSON({ event: "addRoom", payload: { room } }));
+    user.ws.send(messageToJSON({ event: "addRoom", payload: room }));
   } catch {
     sendErrorMessage(ws, "DATABASE_ERROR");
   }
