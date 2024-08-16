@@ -4,6 +4,6 @@
 
 @layer base {
   body {
-    @apply bg-aliceBlue text-cocoaBean;
+    @apply bg-aliceBlue text-cocoaBean font-manrope;
   }
 }

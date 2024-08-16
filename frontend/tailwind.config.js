@@ -15,6 +15,9 @@ export default {
         cocoaBean: "#471F2D",
         grayish: "#6b7280",
       },
+      fontFamily: {
+        manrope: ["Manrope", "latin"],
+      },
     },
   },
   plugins: [],
