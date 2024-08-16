@@ -5,7 +5,7 @@ export default {
     extend: {
       colors: {
         aliceBlue: "#F0F7FF",
-        hippieBlie: "#628FBC",
+        hippieBlue: "#628FBC",
         periwinkleGray: "#B8CCE0",
         zircon: "#FBFDFF",
         vanillaIce: "#EEC3E8",
@@ -13,6 +13,7 @@ export default {
         hummingBird: "#C9EBF7",
         solitude: "#E6F2FF",
         cocoaBean: "#471F2D",
+        grayish: "#6b7280",
       },
     },
   },
