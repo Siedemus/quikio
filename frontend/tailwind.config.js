@@ -2,7 +2,19 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        aliceBlue: "#F0F7FF",
+        hippieBlie: "#628FBC",
+        periwinkleGray: "#B8CCE0",
+        zircon: "#FBFDFF",
+        vanillaIce: "#EEC3E8",
+        malibu: "#71B0F4",
+        hummingBird: "#C9EBF7",
+        solitude: "#E6F2FF",
+        cocoaBean: "#471F2D",
+      },
+    },
   },
   plugins: [],
 };
