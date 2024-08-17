@@ -3,7 +3,6 @@ import hashIcon from "../resources/images/hash.svg";
 import roomBgColors from "../resources/roomBgColors";
 import { useSearchParams } from "react-router-dom";
 import useQueryParam from "../hooks/useQueryParam";
-import clsx from "clsx";
 
 const Rooms = ({ rooms }: { rooms: Room[] }) => {
   const [, updateRoomQuery] = useQueryParam("r");
