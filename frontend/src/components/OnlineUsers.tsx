@@ -14,7 +14,7 @@ const OnlineUsers = ({ onlineUsers }: { onlineUsers: OnlineUser[] }) => {
     <section className="max-w-[350px] min-h-[46vh] px-4 pt-2 border-r border-b border-periwinkleGray">
       <h2 className="py-2 font-bold">Online users</h2>
       {filteredOnlineUsers.length > 0 ? (
-        <ul className="grid grid-cols-2 p-2 gap-4 max-h-[40vh] overflow-y-auto">
+        <ul className="grid grid-cols-2 p-2 gap-4 max-h-[40vh] overflow-y-auto scroll-smooth">
           {filteredOnlineUsers.map((user) => (
             <li className="flex items-center gap-2" key={user.id}>
               <img

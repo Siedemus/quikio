@@ -17,7 +17,7 @@ const Rooms = ({ rooms }: { rooms: Room[] }) => {
     <section className="max-w-[350px] min-h-[46vh] px-4 pt-2 border-r border-b border-periwinkleGray">
       <h2 className="py-2 font-bold">Rooms</h2>
       {filteredRooms.length > 0 ? (
-        <ul className="grid grid-cols-2 p-2 gap-4 max-h-[40vh] overflow-y-auto">
+        <ul className="grid grid-cols-2 p-2 gap-4 max-h-[40vh] overflow-y-auto scroll-smooth">
           {filteredRooms.map((room, i) => {
             const color = roomColors[i % roomColors.length];
 
