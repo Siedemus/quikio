@@ -4,7 +4,7 @@ const Search = () => {
   const [query, updateQuery] = useQueryParam("q");
 
   return (
-    <section className="bg-aliceBlue p-4 flex gap-2 border-b border-periwinkleGray row-span-1 min-h-[73px]">
+    <section className="bg-aliceBlue p-4 flex gap-2 border-b border-periwinkleGray row-span-1 min-h-[72px]">
       <input
         className="border border-hippieBlue rounded-2xl bg-aliceBlue placeholder:text-gray-500 pl-4 py-1 w-full"
         placeholder="Search users or channels..."
