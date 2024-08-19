@@ -1,18 +1,10 @@
-import OnlineUsers from "./components/OnlineUsers";
-import Rooms from "./components/rooms";
-import Search from "./components/Search";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Chat from "./pages/Chat";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <>
-        <Search />
-        <OnlineUsers onlineUsers={[]} />
-        <Rooms rooms={[]} />
-      </>
-    ),
+    element: <Chat />,
   },
 ]);
 
