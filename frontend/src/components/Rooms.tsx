@@ -14,10 +14,10 @@ const Rooms = ({ rooms }: { rooms: Room[] }) => {
     : rooms;
 
   return (
-    <section className="max-w-[350px] min-h-[46vh] px-4 pt-2 border-r border-b border-periwinkleGray">
+    <section className="min-h-[46vh] w-full px-4 pt-2 border-b border-periwinkleGray">
       <h2 className="py-2 font-bold">Rooms</h2>
       {filteredRooms.length > 0 ? (
-        <ul className="grid grid-cols-2 p-2 gap-4 max-h-[40vh] overflow-y-auto scroll-smooth">
+        <ul className="grid grid-cols-2 p-2 gap-4 max-h-[40vh] overflow-auto scroll-smooth">
           {filteredRooms.map((room, i) => {
             const color = roomBgColors[i % roomBgColors.length];
 
@@ -29,15 +29,15 @@ const Rooms = ({ rooms }: { rooms: Room[] }) => {
               >
                 <img
                   src={hashIcon}
-                  className={`w-11 h-11 rounded-full bg-va ${color}`}
-                ></img>
+                  className={`w-11 h-11 rounded-full ${color}`}
+                />
                 <p className="truncate">{room.name}</p>
               </li>
             );
           })}
         </ul>
       ) : (
-        <div className="min-h-[40vh] flex items-center justify-center">
+        <div className="min-h-[40vh] flex justify-center items-center">
           <p>No rooms found.</p>
         </div>
       )}
