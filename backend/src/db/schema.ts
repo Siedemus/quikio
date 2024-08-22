@@ -1,5 +1,4 @@
 import {
-  boolean,
   integer,
   pgTable,
   serial,
@@ -29,6 +28,7 @@ export const messages = pgTable("messages", {
   roomId: integer("roomId")
     .notNull()
     .references(() => rooms.id),
+  username: varchar("username", { length: 20 }).notNull(),
 });
 
 export const userRoomSubscriptions = pgTable("user_room_subscriptions", {
