@@ -62,6 +62,7 @@ export type BaseMessageEventPayload = {
   content: string;
   id: number;
   token: string;
+  name: string;
 };
 
 export type BaseMessageEvent = {
@@ -115,15 +116,13 @@ export type RemoveRoomEvent = {
 
 export type VerifyTokenEventPayload = {
   token: string;
+  userId: number;
+  username: string;
 };
 
 export type VerifyTokenEvent = {
   event: "verifyToken";
   payload: VerifyTokenEventPayload;
-};
-
-export type ExpiredTokenEvent = {
-  event: "expiredToken";
 };
 
 export type VerifiedTokenEvent = {
@@ -144,8 +143,7 @@ export type ServerEvents =
   | NewOnlineUserEvent
   | addRoomEvent
   | RemoveRoomEvent
-  | VerifiedTokenEvent
-  | ExpiredTokenEvent;
+  | VerifiedTokenEvent;
 export interface DecodedToken extends JwtPayload {
   id: string;
   name: string;
