@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS "messages" (
 	"content" varchar(255) NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"userId" integer NOT NULL,
-	"roomId" integer NOT NULL
+	"roomId" integer NOT NULL,
+	"username" varchar(20) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "rooms" (
