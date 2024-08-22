@@ -6,6 +6,7 @@ import { fileURLToPath } from "bun";
 import { handleMessage } from "./handlers/handleMessage";
 import { JSONToMessage } from "./utils/JSONToMessage";
 import { sendErrorMessage } from "./utils/sendErrorMessage";
+import onlineUsersManager from "./models/onlineUsersManager";
 
 const PORT = process.env.PORT || 8080;
 
@@ -35,11 +36,11 @@ server.on("upgrade", (req, socket, head) => {
     });
 
     ws.on("error", () => {
-      // handle on message event
+      onlineUsersManager.removeUser(ws);
     });
 
-    ws.on("close", () => {
-      // handle on message event
+    ws.on("close", (ws) => {
+      onlineUsersManager.removeUser(ws);
     });
   });
 });
