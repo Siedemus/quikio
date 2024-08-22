@@ -7,6 +7,7 @@ export type Message = {
   createdAt: Date;
   roomId: number;
   userId: number;
+  username: string;
 };
 
 export type Room = {
@@ -38,6 +39,8 @@ export type AuthorizedEventPayload = {
   token: string;
   rooms: Room[];
   onlineUsers: OnlineUser[];
+  userId: number;
+  username: string;
 };
 
 export type AuthorizedEvent = {
@@ -110,11 +113,29 @@ export type RemoveRoomEvent = {
   payload: RemoveRoomEventPayload;
 };
 
+export type VerifyTokenEventPayload = {
+  token: string;
+};
+
+export type VerifyTokenEvent = {
+  event: "verifyToken";
+  payload: VerifyTokenEventPayload;
+};
+
+export type ExpiredTokenEvent = {
+  event: "expiredToken";
+};
+
+export type VerifiedTokenEvent = {
+  event: "verifiedToken";
+};
+
 export type ClientEvents =
   | AuthorizationEvent
   | BaseMessageEvent
   | SubscribeRoomEvent
-  | UnsubscribeRoomEvent;
+  | UnsubscribeRoomEvent
+  | VerifyTokenEvent;
 
 export type ServerEvents =
   | ErrorEvent
@@ -122,7 +143,9 @@ export type ServerEvents =
   | NewMessageEvent
   | NewOnlineUserEvent
   | addRoomEvent
-  | RemoveRoomEvent;
+  | RemoveRoomEvent
+  | VerifiedTokenEvent
+  | ExpiredTokenEvent;
 export interface DecodedToken extends JwtPayload {
   id: string;
   name: string;
