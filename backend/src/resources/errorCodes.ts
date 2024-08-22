@@ -36,4 +36,9 @@ export const errorCodes = {
     code: 107,
     content: "You are already not subscribing to this room.",
   },
+  EXPIRED_OR_MISSMATCHING: {
+    code: 108,
+    content:
+      "Your token is probably expired or provided data is not matching token data.",
+  },
 };
