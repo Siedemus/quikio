@@ -1,4 +1,5 @@
 import type { OnlineUserSocket } from "../types/types";
+import * as ws from "ws";
 
 class OnlineUsersManager {
   private onlineUsers: OnlineUserSocket[] = [];
@@ -7,8 +8,12 @@ class OnlineUsersManager {
     this.onlineUsers.push(user);
   }
 
-  removeUser(userId: number): void {
-    this.onlineUsers = this.onlineUsers.filter((user) => user.id !== userId);
+  removeUser(data: number | ws.WebSocket): void {
+    if (typeof data === "number") {
+      this.onlineUsers = this.onlineUsers.filter((user) => user.id !== data);
+      return;
+    }
+    this.onlineUsers = this.onlineUsers.filter((user) => user.ws !== data);
   }
 
   getUser(userId: number): OnlineUserSocket | undefined {
