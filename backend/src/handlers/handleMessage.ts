@@ -23,6 +23,9 @@ export const handleMessage = async (
   ws: ws.WebSocket
 ) => {
   switch (message.event) {
+    case "verifyToken":
+      handleTokenVerification(ws, message.payload);
+      break;
     case "authorization":
       const isValid = validateUserData(message.payload);
       if (!isValid) {
@@ -47,6 +50,22 @@ export const handleMessage = async (
   }
 };
 
+const handleTokenVerification = (
+  ws: ws.WebSocket,
+  message: { token: string; userId: number; username: string }
+) => {
+  const decodedToken = decodeToken(message.token);
+  const usernameMatch = decodedToken?.name === message.username;
+  const userIdMatch = decodedToken?.id === message.userId;
+
+  if (!decodedToken || !usernameMatch || !userIdMatch) {
+    sendErrorMessage(ws, "EXPIRED_OR_MISSMATCHING");
+    return;
+  }
+
+  ws.send(messageToJSON({ event: "verifiedToken" }));
+};
+
 const handleAuthorization = async (
   ws: ws.WebSocket,
   inputUser: { name: string; password: string }
@@ -65,6 +84,7 @@ const handleAuthorization = async (
 
     const token = generateToken(user.name, user.id);
     const rooms = await createRooms(user);
+    onlineUsersManager.addUser({ id: user.id, name: user.name, ws });
     const onlineUsers = onlineUsersManager.getUsers();
     const formattedOnlineUsers = onlineUsers.map(({ id, name }) => ({
       id,
@@ -74,11 +94,17 @@ const handleAuthorization = async (
     ws.send(
       messageToJSON({
         event: "authorized",
-        payload: { token, rooms, onlineUsers: formattedOnlineUsers },
+        payload: {
+          token,
+          rooms,
+          onlineUsers: formattedOnlineUsers,
+          userId: user.id,
+          username: user.name,
+        },
       })
     );
 
-    sendNewOnlineUser(onlineUsers);
+    sendNewOnlineUser(onlineUsers, user.id);
   } catch {
     sendErrorMessage(ws, "DATABASE_ERROR");
   }
@@ -90,6 +116,7 @@ const handleBaseMessageEvent = async (
     content: string;
     token: string;
     id: number;
+    name: string;
   }
 ) => {
   const decodedToken = decodeToken(message.token);
@@ -104,6 +131,7 @@ const handleBaseMessageEvent = async (
       userId: decodedToken.id,
       roomId: message.id,
       content: message.content,
+      username: message.name,
     });
     const onlineUsers = onlineUsersManager.getUsers();
 
@@ -245,12 +273,14 @@ const createRooms = async (user: {
   return rooms;
 };
 
-const sendNewOnlineUser = (onlineUsers: OnlineUserSocket[]) => {
+const sendNewOnlineUser = (onlineUsers: OnlineUserSocket[], userId: number) => {
   for (const onlineUser of onlineUsers) {
     const { id, name } = onlineUser;
-    onlineUser.ws.send(
-      messageToJSON({ event: "newOnlineUser", payload: { id, name } })
-    );
+    if (userId !== id) {
+      onlineUser.ws.send(
+        messageToJSON({ event: "newOnlineUser", payload: { id, name } })
+      );
+    }
   }
 };
 
