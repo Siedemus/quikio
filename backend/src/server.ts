@@ -39,7 +39,7 @@ server.on("upgrade", (req, socket, head) => {
       onlineUsersManager.removeUser(ws);
     });
 
-    ws.on("close", (ws) => {
+    ws.on("close", () => {
       onlineUsersManager.removeUser(ws);
     });
   });
