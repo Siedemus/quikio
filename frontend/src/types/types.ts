@@ -10,7 +10,7 @@ export type Message = {
 export type Room = {
   name: string;
   id: number;
-  messages?: Message[];
+  messages: Message[] | undefined;
 };
 
 export type OnlineUser = {
@@ -130,6 +130,7 @@ export type VerifyTokenEvent = {
 
 export type VerifiedTokenEvent = {
   event: "verifiedToken";
+  payload: null
 };
 
 export type ClientEvents =
