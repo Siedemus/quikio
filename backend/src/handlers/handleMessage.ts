@@ -274,11 +274,14 @@ const createRooms = async (user: {
 };
 
 const sendNewOnlineUser = (onlineUsers: OnlineUserSocket[], userId: number) => {
+  const newUser = onlineUsers.find((user) => user.id === userId);
   for (const onlineUser of onlineUsers) {
-    const { id, name } = onlineUser;
-    if (userId !== id) {
+    if (newUser !== undefined && onlineUser.id !== newUser.id) {
       onlineUser.ws.send(
-        messageToJSON({ event: "newOnlineUser", payload: { id, name } })
+        messageToJSON({
+          event: "newOnlineUser",
+          payload: { id: newUser.id, name: newUser.name },
+        })
       );
     }
   }
@@ -305,10 +308,10 @@ const isSubscribing = async (roomId: number, userId: number) => {
 
 const createRoom = async (roomId: number) => {
   const { id, name } = (await getRooms()).find((room) => room.id === roomId)!;
-  const roomMessages = await getRoomMessages(id);
+  const messages = await getRoomMessages(id);
   return {
     id,
     name,
-    roomMessages,
+    messages,
   };
 };
