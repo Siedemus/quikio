@@ -21,6 +21,7 @@ export type OnlineUser = {
 export interface IChatData {
   rooms: Room[];
   onlineUsers: OnlineUser[];
+  userData: { userId: number; username: string } | null;
 }
 
 export interface IChatContext {
@@ -119,8 +120,6 @@ export type RemoveRoomEvent = {
 
 export type VerifyTokenEventPayload = {
   token: string;
-  userId: number;
-  username: string;
 };
 
 export type VerifyTokenEvent = {
@@ -130,7 +129,15 @@ export type VerifyTokenEvent = {
 
 export type VerifiedTokenEvent = {
   event: "verifiedToken";
-  payload: null
+  payload: AuthorizedEventPayload;
+};
+
+export type useChatHookReturnings = {
+  chatData: IChatData;
+  authenticated: boolean;
+  loading: boolean;
+  failed: boolean;
+  send: (message: ClientEvents) => void;
 };
 
 export type ClientEvents =
