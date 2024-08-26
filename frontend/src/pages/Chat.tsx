@@ -1,18 +1,21 @@
-import MessageBox from "../components/MessageBox/MessageBox";
-import OnlineUsers from "../components/OnlineUsers";
-import Rooms from "../components/Rooms";
-import Search from "../components/Search";
+import { useContext } from "react";
+import Loader from "../components/common/Loader";
+import { ChatContext } from "../context/ChatContext";
+import ChatView from "../components/ChatView/ChatView";
+import Failed from "../components/common/Failed";
+import { Navigate } from "react-router-dom";
 
 const Chat = () => {
-  return (
-    <section className="w-screen h-screen flex">
-      <div className="w-[320px] bg-aliceBlue absolute hidden lg:static lg:block border-r border-periwinkleGray">
-        <Search />
-        <Rooms rooms={[]} />
-        <OnlineUsers onlineUsers={[]} />
-      </div>
-      <MessageBox />
-    </section>
+  const { authenticated, loading, failed } = useContext(ChatContext)!;
+
+  return authenticated ? (
+    <ChatView />
+  ) : loading ? (
+    <Loader />
+  ) : failed ? (
+    <Failed content={"placeholder"} />
+  ) : (
+    <Navigate to={"/login"} />
   );
 };
 
