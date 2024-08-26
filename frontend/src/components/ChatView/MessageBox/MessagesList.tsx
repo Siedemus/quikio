@@ -1,9 +1,14 @@
-import { Message } from "../../types/types";
-import placeholderUser from "../../resources/images/placeholderUser.jpg";
+import { Message } from "../../../types/types";
+import placeholderUser from "../../../resources/images/placeholderUser.jpg";
 import { useEffect, useRef } from "react";
 
-const Messages = ({ messages }: { messages: Message[] }) => {
-  const username = "michael";
+const MessagesList = ({
+  messages,
+  username,
+}: {
+  messages: Message[];
+  username: string;
+}) => {
   const listRef = useRef<HTMLUListElement | null>(null);
 
   const scrollToBottom = () => {
@@ -12,9 +17,13 @@ const Messages = ({ messages }: { messages: Message[] }) => {
     }
   };
 
-  useEffect(scrollToBottom, []);
+  useEffect(scrollToBottom, [messages]);
 
-  return messages.length !== 0 ? (
+  return messages.length === 0 ? (
+    <p className="flex-grow flex items-center justify-center p-4 text-center">
+      No messages. You sould type something!
+    </p>
+  ) : (
     <ul
       ref={listRef}
       className={`p-4 lg:p-6 flex flex-col gap-4 overflow-y-auto flex-grow`}
@@ -45,11 +54,7 @@ const Messages = ({ messages }: { messages: Message[] }) => {
         </li>
       ))}
     </ul>
-  ) : (
-    <p className="flex-grow flex items-center justify-center p-4 text-center">
-      No messages. You sould type something!
-    </p>
   );
 };
 
-export default Messages;
+export default MessagesList;
