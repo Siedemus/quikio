@@ -15,6 +15,7 @@ import {
   getRooms,
   subscribeToRoom,
   unsubscribeToRoom,
+  getUserById,
 } from "../db/querries";
 import onlineUsersManager from "../models/onlineUsersManager";
 
@@ -50,20 +51,43 @@ export const handleMessage = async (
   }
 };
 
-const handleTokenVerification = (
+const handleTokenVerification = async (
   ws: ws.WebSocket,
-  message: { token: string; userId: number; username: string }
+  message: { token: string }
 ) => {
   const decodedToken = decodeToken(message.token);
-  const usernameMatch = decodedToken?.name === message.username;
-  const userIdMatch = decodedToken?.id === message.userId;
 
-  if (!decodedToken || !usernameMatch || !userIdMatch) {
+  if (!decodedToken) {
     sendErrorMessage(ws, "EXPIRED_OR_MISSMATCHING");
     return;
   }
 
-  ws.send(messageToJSON({ event: "verifiedToken" }));
+  const { id, name } = decodedToken;
+  let user = await getUserById(id);
+  if (!user) {
+    return;
+  }
+  const token = generateToken(user.name, user.id);
+  const rooms = await createRooms(user);
+  onlineUsersManager.addUser({ id: user.id, name: user.name, ws });
+  const onlineUsers = onlineUsersManager.getUsers();
+  const formattedOnlineUsers = onlineUsers.map(({ id, name }) => ({
+    id,
+    name,
+  }));
+
+  ws.send(
+    messageToJSON({
+      event: "verifiedToken",
+      payload: {
+        rooms,
+        onlineUsers: formattedOnlineUsers,
+        token,
+        userId: id,
+        username: name,
+      },
+    })
+  );
 };
 
 const handleAuthorization = async (
@@ -267,7 +291,7 @@ const createRooms = async (user: {
   }
 
   for (const room of notSubscribedRooms) {
-    rooms.push(room);
+    rooms.push({ ...room, messages: undefined });
   }
 
   return rooms;

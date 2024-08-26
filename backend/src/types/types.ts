@@ -116,8 +116,6 @@ export type RemoveRoomEvent = {
 
 export type VerifyTokenEventPayload = {
   token: string;
-  userId: number;
-  username: string;
 };
 
 export type VerifyTokenEvent = {
@@ -127,7 +125,7 @@ export type VerifyTokenEvent = {
 
 export type VerifiedTokenEvent = {
   event: "verifiedToken";
-  payload: null;
+  payload: AuthorizedEventPayload;
 };
 
 export type ClientEvents =
