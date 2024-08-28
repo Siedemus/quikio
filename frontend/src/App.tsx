@@ -11,6 +11,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Navigate to="/login" />,
+    errorElement: <Navigate to="/login" />,
   },
   {
     path: "/chat",
