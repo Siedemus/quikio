@@ -16,6 +16,7 @@ import {
   ServerEvents,
   useChatHookReturnings,
 } from "../types/types";
+import { Navigate } from "react-router-dom";
 
 const RECONNECT_DELAY = 5000;
 const MAX_RECCONECTION_ATTEMPTS = 3;
@@ -134,10 +135,14 @@ const useChat = (url: string): useChatHookReturnings => {
     const { code, content } = payload;
     const errorCodesArray = Object.values(errorCodes);
     const isCodeMatched = errorCodesArray.some((error) => error.code === code);
+    const isTokenExpired = payload.code === 104 || payload.code === 108;
 
     toast.error(`ERROR-${code}: ${content}`);
     if (isCodeMatched) {
       setFailed(true);
+    }
+    if (isTokenExpired) {
+      Navigate({ to: "/login" });
     }
   }, []);
 
