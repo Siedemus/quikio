@@ -13,9 +13,6 @@ const RootComponent = () => {
   );
 };
 
-console.log(process.env.NODE_ENV);
-
-
 createRoot(document.getElementById("root")!).render(
   process.env.NODE_ENV === "production" ? (
     <RootComponent />

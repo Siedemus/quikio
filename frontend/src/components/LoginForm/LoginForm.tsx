@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
-import regex from "../../utils/regex";
+import regex from "../../resources/regex";
 import { ChatContext } from "../../context/ChatContext";
 
 const LoginForm = ({}: {}) => {
