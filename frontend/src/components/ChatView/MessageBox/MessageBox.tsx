@@ -15,7 +15,6 @@ const MessageBox = ({
   };
 }) => {
   const { chatData, send } = useContext(ChatContext)!;
-  console.log(chatData);
   const { rooms, userData } = chatData;
   const { username } = userData!;
   const [roomQuery] = useQueryParam("r");

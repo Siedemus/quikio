@@ -4,9 +4,21 @@ import App from "./App.tsx";
 import "./index.css";
 import { Toaster } from "sonner";
 
+const RootComponent = () => {
+  return (
+    <>
+      <App />
+      <Toaster richColors />
+    </>
+  );
+};
+
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-    <Toaster richColors />
-  </StrictMode>
+  process.env.NODE_ENV === "prod" ? (
+    <RootComponent />
+  ) : (
+    <StrictMode>
+      <RootComponent />
+    </StrictMode>
+  )
 );
