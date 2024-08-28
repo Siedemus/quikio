@@ -10,10 +10,10 @@ const Chat = () => {
 
   return authenticated ? (
     <ChatView />
+  ) : failed ? (
+    <Failed />
   ) : loading ? (
     <Loader />
-  ) : failed ? (
-    <Failed content={"placeholder"} />
   ) : (
     <Navigate to={"/login"} />
   );

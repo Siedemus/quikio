@@ -10,10 +10,10 @@ const Login = () => {
 
   return authenticated ? (
     <Navigate to="/chat" />
+  ) : failed ? (
+    <Failed />
   ) : loading ? (
     <Loader />
-  ) : failed ? (
-    <Failed content="Smth went wrong" />
   ) : (
     <LoginForm />
   );
