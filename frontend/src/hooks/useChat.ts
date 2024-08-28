@@ -3,6 +3,7 @@ import { JSONToMessage } from "../utils/JSONToMessage";
 import { toast } from "sonner";
 import { messageToJSON } from "../utils/messageToJSON";
 import errorCodes from "../resources/errorCodes";
+import getSessionToken from "../utils/getSessionToken";
 import {
   AuthorizedEventPayload,
   ClientEvents,
@@ -15,7 +16,9 @@ import {
   ServerEvents,
   useChatHookReturnings,
 } from "../types/types";
-import getSessionToken from "../utils/getSessionToken";
+
+const RECONNECT_DELAY = 5000;
+const MAX_RECCONECTION_ATTEMPTS = 3;
 
 const useChat = (url: string): useChatHookReturnings => {
   const [loading, setLoading] = useState(false);
@@ -27,31 +30,33 @@ const useChat = (url: string): useChatHookReturnings => {
     userData: null,
   });
   const wsRef = useRef<null | WebSocket>(null);
-  let connectionAttempts = 0;
+  const connectionAttemptsRef = useRef(0);
 
   useEffect(() => {
     connect(url);
 
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      } else {
-        handleError(errorCodes["UNEXPECTED_ERROR_DURING_CLOSING_CONNECTION"]);
-        setFailed(true);
+      if (!wsRef.current) {
+        handleError(errorCodes["WEBSOCKET_REF_NULL"]);
+        return;
       }
+
+      wsRef.current.close();
     };
   }, [url]);
 
   const connect = useCallback(
     (url: string) => {
       setLoading(true);
+      setFailed(false);
       wsRef.current = new WebSocket(url);
 
       wsRef.current.addEventListener("open", () => {
+        toast.success("Successfully established connection.");
+
         const token = getSessionToken();
-        if (token) {
-          console.log(token);
-          wsRef.current?.send(
+        if (token && wsRef.current) {
+          wsRef.current.send(
             messageToJSON({
               event: "verifyToken",
               payload: { token },
@@ -66,32 +71,35 @@ const useChat = (url: string): useChatHookReturnings => {
       wsRef.current.addEventListener(
         "message",
         ({ data }: { data: string }) => {
-          console.log(data);
-
           const message = JSONToMessage(data);
           handleServerEvent(message);
         }
       );
 
       wsRef.current.addEventListener("close", () => {
-        setLoading(true);
-        connectionAttempts++;
-        if (connectionAttempts > 3) {
-          handleError(errorCodes["CANT_CONNECT_TO_SERVER"]);
-          setFailed(true);
-          return;
-        }
-        const timeout = 5 * 1000 * connectionAttempts;
-        setTimeout(() => connect(url), timeout);
+        reconnect();
       });
 
       wsRef.current.addEventListener("error", () => {
-        handleError(errorCodes["UNEXPECTED_ERROR"]);
-        setFailed(true);
+        handleError(errorCodes["UNEXPECTED_ERROR_TRYING_AGAIN"]);
       });
     },
     [url]
   );
+
+  const reconnect = useCallback(() => {
+    setLoading(true);
+    setFailed(false);
+
+    connectionAttemptsRef.current++;
+    if (connectionAttemptsRef.current >= MAX_RECCONECTION_ATTEMPTS) {
+      handleError(errorCodes["CANT_CONNECT_TO_SERVER"]);
+      return;
+    }
+
+    const timeout = RECONNECT_DELAY * connectionAttemptsRef.current;
+    setTimeout(() => connect(url), timeout);
+  }, []);
 
   const handleServerEvent = (message: ServerEvents) => {
     const { event, payload } = message;
@@ -100,6 +108,7 @@ const useChat = (url: string): useChatHookReturnings => {
       case "error":
         handleError(payload);
         break;
+      case "verifiedToken":
       case "authorized":
         handleAuthorizedMessage(payload);
         break;
@@ -115,34 +124,40 @@ const useChat = (url: string): useChatHookReturnings => {
       case "removeRoom":
         handleRemoveRoom(payload);
         break;
-      case "verifiedToken":
-        handleAuthorizedMessage(payload);
-        break;
       default:
         handleError(errorCodes["NOT_HANDLED_ERROR"]);
-        setFailed(true);
         break;
     }
   };
 
-  const handleError = (payload: ErrorEventPayload) => {
-    toast.error(`ERROR-${payload.code}: ${payload.content}`);
-  };
+  const handleError = useCallback((payload: ErrorEventPayload) => {
+    const { code, content } = payload;
+    const errorCodesArray = Object.values(errorCodes);
+    const isCodeMatched = errorCodesArray.some((error) => error.code === code);
 
-  const handleAuthorizedMessage = (payload: AuthorizedEventPayload) => {
-    const { token, rooms, onlineUsers, ...userData } = payload;
-    sessionStorage.setItem("token", token);
+    toast.error(`ERROR-${code}: ${content}`);
+    if (isCodeMatched) {
+      setFailed(true);
+    }
+  }, []);
 
-    setChatData((prevChatData) => ({
-      ...prevChatData,
-      rooms,
-      onlineUsers,
-      userData,
-    }));
-    setAuthenticated(true);
-  };
+  const handleAuthorizedMessage = useCallback(
+    (payload: AuthorizedEventPayload) => {
+      const { token, rooms, onlineUsers, ...userData } = payload;
+      sessionStorage.setItem("token", token);
 
-  const handleNewBaseMessage = (payload: Message) => {
+      setChatData((prevChatData) => ({
+        ...prevChatData,
+        rooms,
+        onlineUsers,
+        userData,
+      }));
+      setAuthenticated(true);
+    },
+    []
+  );
+
+  const handleNewBaseMessage = useCallback((payload: Message) => {
     setChatData((prevChatData) => ({
       ...prevChatData,
       rooms: prevChatData.rooms.map((room) =>
@@ -154,43 +169,43 @@ const useChat = (url: string): useChatHookReturnings => {
           : room
       ),
     }));
-  };
+  }, []);
 
-  const handleNewOnlineUser = (payload: OnlineUser) => {
-    console.log(payload);
-
+  const handleNewOnlineUser = useCallback((payload: OnlineUser) => {
     setChatData((prevChatData) => ({
       ...prevChatData,
       onlineUsers: [...prevChatData.onlineUsers, payload],
     }));
-  };
+  }, []);
 
-  const handleNewRoom = (payload: Room) => {
+  const handleNewRoom = useCallback((payload: Room) => {
     setChatData((prevChatData) => ({
       ...prevChatData,
       rooms: prevChatData.rooms.map((room) =>
         room.id === payload.id ? { ...room, messages: payload.messages } : room
       ),
     }));
-  };
+  }, []);
 
-  const handleRemoveRoom = (payload: RemoveRoomEventPayload) => {
+  const handleRemoveRoom = useCallback((payload: RemoveRoomEventPayload) => {
     setChatData((prevChatData) => ({
       ...prevChatData,
       rooms: prevChatData.rooms.map((room) =>
         room.id === payload.id ? { ...room, messages: undefined } : room
       ),
     }));
-  };
-
-  const sendMessage = useCallback((message: ClientEvents) => {
-    if (wsRef.current === null) {
-      handleError(errorCodes["UNEXPECTED_ERROR"]);
-      setFailed(true);
-      return;
-    }
-    wsRef.current.send(messageToJSON(message));
   }, []);
+
+  const sendMessage = useCallback(
+    (message: ClientEvents) => {
+      if (!wsRef.current) {
+        handleError(errorCodes["WEBSOCKET_REF_NULL"]);
+        return;
+      }
+      wsRef.current.send(messageToJSON(message));
+    },
+    [handleError]
+  );
 
   return { chatData, authenticated, loading, failed, send: sendMessage };
 };
