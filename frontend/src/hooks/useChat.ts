@@ -16,7 +16,6 @@ import {
   ServerEvents,
   useChatHookReturnings,
 } from "../types/types";
-import { Navigate } from "react-router-dom";
 
 const RECONNECT_DELAY = 5000;
 const MAX_RECCONECTION_ATTEMPTS = 3;
@@ -142,7 +141,8 @@ const useChat = (url: string): useChatHookReturnings => {
       setFailed(true);
     }
     if (isTokenExpired) {
-      Navigate({ to: "/login" });
+      setAuthenticated(false);
+      sessionStorage.removeItem("token");
     }
   }, []);
 
