@@ -3,23 +3,31 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import Chat from "./pages/Chat";
 import ChatContextProvider from "./context/ChatContext";
-import Login from "./pages/Login";
+import AuthWrapper from "./components/common/AuthWrapper";
+import ChatView from "./components/ChatView/ChatView";
+import LoginForm from "./components/LoginForm/LoginForm";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Navigate to="/login" />,
-    errorElement: <Navigate to="/login" />,
   },
   {
     path: "/chat",
-    element: <Chat />,
+    element: (
+      <AuthWrapper requireAuth>
+        <ChatView />
+      </AuthWrapper>
+    ),
   },
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <AuthWrapper>
+        <LoginForm />
+      </AuthWrapper>
+    ),
   },
 ]);
 
