@@ -1,7 +1,7 @@
 import { Room } from "../../../types/types";
 import hashIcon from "../../../resources/images/hash.svg";
-import roomBgColors from "../../../resources/roomBgColors";
 import useQueryParam from "../../../hooks/useQueryParam";
+import getBgColorIdBased from "../../../utils/getBgColorIdBased";
 
 const Rooms = ({ rooms }: { rooms: Room[] }) => {
   const [roomQuery, updateRoomQuery] = useQueryParam("r");
@@ -27,10 +27,10 @@ const Rooms = ({ rooms }: { rooms: Room[] }) => {
       {filteredRooms.length > 0 ? (
         <ul className="grid grid-cols-2 p-1 gap-4 max-h-[40vh] overflow-auto scroll-smooth">
           {filteredRooms.map((room) => {
-            const color = roomBgColors[room.id % roomBgColors.length];
+            const color = getBgColorIdBased(room.id);
 
             return (
-              <li key={room.id}>
+              <li key={room.id} title={room.name}>
                 <button
                   onClick={() => selectRoom(room.id)}
                   className="flex w-full items-center gap-2 hover:bg-solitude rounded-full duration-300 cursor-pointer hover:text-hippieBlue disabled:bg-gray-200 disabled:hover:text-cocoaBean disabled:cursor-not-allowed"

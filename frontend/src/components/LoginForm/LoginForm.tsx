@@ -54,7 +54,7 @@ const LoginForm = ({}: {}) => {
           Username
         </label>
         <input
-          className="bg-aliceBlue border-hippieBlue border rounded-xl p-1 mt-2"
+          className="bg-aliceBlue border-hippieBlue border rounded-xl py-1 px-2 mt-2"
           name="username"
           type="text"
           onChange={(e) => onChange(e)}
@@ -63,7 +63,7 @@ const LoginForm = ({}: {}) => {
           Password
         </label>
         <input
-          className="bg-aliceBlue border-hippieBlue border rounded-xl p-1 mt-2"
+          className="bg-aliceBlue border-hippieBlue border rounded-xl py-1 px-2 mt-2"
           name="password"
           type="password"
           onChange={(e) => onChange(e)}

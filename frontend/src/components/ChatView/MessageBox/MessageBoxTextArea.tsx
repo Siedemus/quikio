@@ -4,6 +4,7 @@ import unsubscribeIcon from "../../../resources/images/unsubscribe.svg";
 import { ClientEvents } from "../../../types/types";
 import useQueryParam from "../../../hooks/useQueryParam";
 import getSessionToken from "../../../utils/getSessionToken";
+import { toast } from "sonner";
 
 const MessageBoxTextArea = ({
   send,
@@ -22,11 +23,14 @@ const MessageBoxTextArea = ({
     const trimmedValue = value.trim();
     if (!trimmedValue) {
       inputRef.current?.focus;
+      toast.warning("You should type something.");
+      return;
     }
     send({
       event: "base",
       payload: { content: value, id: roomId, token, name: username },
     });
+    setValue("");
   };
 
   const handleUnsubscribe = () => {
@@ -34,8 +38,11 @@ const MessageBoxTextArea = ({
   };
 
   const onChange = (content: string) => {
-    const trimmedValue = content.trim();
-    setValue(trimmedValue);
+    setValue(content);
+  };
+
+  const onKeyDown = (key: string) => {
+    if (key === "Enter") handleBaseMessage();
   };
 
   return (
@@ -49,9 +56,11 @@ const MessageBoxTextArea = ({
       </button>
       <input
         ref={inputRef}
+        value={value}
         type="text"
-        className="w-full h-11 border border-periwinkleGray rounded flex-shrink"
+        className="w-full h-11 border border-periwinkleGray rounded flex-shrink p-2"
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => onKeyDown(e.key)}
       />
       <button
         className="w-11 h-11 bg-vanillaIce rounded-md hover:brightness-110 active:brightness-75 duration-300"

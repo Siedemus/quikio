@@ -10,10 +10,6 @@ import LoginForm from "./components/LoginForm/LoginForm";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Navigate to="/login" />,
-  },
-  {
     path: "/chat",
     element: (
       <AuthWrapper requireAuth>
@@ -28,6 +24,10 @@ const router = createBrowserRouter([
         <LoginForm />
       </AuthWrapper>
     ),
+  },
+  {
+    path: "*",
+    element: <Navigate to="/login" />,
   },
 ]);
 

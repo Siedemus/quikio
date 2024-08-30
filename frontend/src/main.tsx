@@ -8,7 +8,7 @@ const RootComponent = () => {
   return (
     <>
       <App />
-      <Toaster richColors />
+      <Toaster richColors closeButton position="top-right"/>
     </>
   );
 };

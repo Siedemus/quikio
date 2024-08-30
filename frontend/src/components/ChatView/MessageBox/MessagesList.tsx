@@ -30,6 +30,7 @@ const MessagesList = ({
     >
       {messages.map((message) => (
         <li
+          key={message.id}
           className={`flex max-w-[550px] w-full gap-4 items-center rounded-xl p-2 ${
             username === message.username
               ? "self-end flex-row-reverse bg-vanillaIce"

@@ -16,6 +16,7 @@ const OnlineUsers = ({ onlineUsers }: { onlineUsers: OnlineUser[] }) => {
         <ul className="grid grid-cols-2 p-1 gap-4 max-h-[40vh] overflow-auto scroll-smooth">
           {filteredOnlineUsers.map((user) => (
             <li
+              title={user.name}
               className="flex items-center gap-2 hover:bg-solitude rounded-full duration-300 cursor-pointer hover:text-hippieBlue"
               key={user.id}
             >

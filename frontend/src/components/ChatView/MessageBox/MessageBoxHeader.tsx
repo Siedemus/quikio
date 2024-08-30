@@ -1,7 +1,7 @@
 import hashIcon from "../../../resources/images/hash.svg";
 import hamburgerIcon from "../../../resources/images/hamburger.svg";
-import roomColors from "../../../resources/roomBgColors";
 import { Room } from "../../../types/types";
+import getBgColorIdBased from "../../../utils/getBgColorIdBased";
 
 const MessageBoxHeader = ({
   room,
@@ -14,9 +14,7 @@ const MessageBoxHeader = ({
   };
 }) => {
   const { setShowSidebar } = sidebarState;
-  const roomColor = room
-    ? roomColors[room.id % roomColors.length]
-    : "bg-gray-300";
+  const roomColor = room ? getBgColorIdBased(room.id) : "bg-gray-300";
 
   return (
     <section className="p-3 flex items-center border-b border-periwinkleGray min-h-[72px]">
