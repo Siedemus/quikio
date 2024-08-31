@@ -8,7 +8,8 @@ import { JSONToMessage } from "./utils/JSONToMessage";
 import { sendErrorMessage } from "./utils/sendErrorMessage";
 import onlineUsersManager from "./models/onlineUsersManager";
 
-const PORT = process.env.PORT || 8080;
+const PORT = Number(process.env.PORT) || 8080;
+const HOST = process.env.HOST || "0.0.0.0";
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
@@ -46,6 +47,6 @@ server.on("upgrade", (req, socket, head) => {
   });
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, HOST, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
