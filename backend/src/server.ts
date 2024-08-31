@@ -48,5 +48,5 @@ server.on("upgrade", (req, socket, head) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`Server is listening on port ${PORT}`);
+  console.log(`Server is listening on port ${PORT} and host ${HOST}`);
 });
