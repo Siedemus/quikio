@@ -8,23 +8,26 @@ import {
   AuthorizedEventPayload,
   ClientEvents,
   ErrorEventPayload,
-  IChatData,
+  IUseChatData,
+  IUseChatStateProps,
   Message,
   OnlineUser,
   RemoveRoomEventPayload,
   Room,
   ServerEvents,
-  useChatHookReturnings,
+  UseChatHookReturnings,
 } from "../types/types";
 
 const RECONNECT_DELAY = 5000;
 const MAX_RECCONECTION_ATTEMPTS = 3;
 
-const useChat = (url: string): useChatHookReturnings => {
-  const [loading, setLoading] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
-  const [chatData, setChatData] = useState<IChatData>({
+const useChat = (url: string): UseChatHookReturnings => {
+  const [state, setState] = useState<IUseChatStateProps>({
+    loading: false,
+    failed: false,
+    authenticated: false,
+  });
+  const [chatData, setChatData] = useState<IUseChatData>({
     rooms: [],
     onlineUsers: [],
     userData: null,
@@ -32,76 +35,68 @@ const useChat = (url: string): useChatHookReturnings => {
   const wsRef = useRef<null | WebSocket>(null);
   const connectionAttemptsRef = useRef(0);
 
+  const updateState = (newState: Partial<IUseChatStateProps>) => {
+    setState((prevState) => ({ ...prevState, ...newState }));
+  };
+
   useEffect(() => {
-    connect(url);
+    const cleanup = connect();
+    return cleanup;
+  }, [url]);
+
+  const connect = useCallback(() => {
+    updateState({ loading: true, failed: false });
+    wsRef.current = new WebSocket(url);
+
+    wsRef.current.addEventListener("open", handleWSOpenEvent);
+    wsRef.current.addEventListener("message", handleWSMessageEvent);
+    wsRef.current.addEventListener("close", reconnect);
+    wsRef.current.addEventListener("error", handleWSErrorEvent);
 
     return () => {
-      if (!wsRef.current) {
-        handleError(errorCodes["WEBSOCKET_REF_NULL"]);
-        return;
-      }
-
-      wsRef.current.close();
+      wsRef.current?.close();
     };
   }, [url]);
 
-  const connect = useCallback(
-    (url: string) => {
-      setLoading(true);
-      setFailed(false);
-      wsRef.current = new WebSocket(url);
+  const handleWSOpenEvent = useCallback(() => {
+    toast.success("Successfully established connection.");
 
-      wsRef.current.addEventListener("open", () => {
-        toast.success("Successfully established connection.");
-
-        const token = getSessionToken();
-        if (token && wsRef.current) {
-          wsRef.current.send(
-            messageToJSON({
-              event: "verifyToken",
-              payload: { token },
-            })
-          );
-        }
-
-        setLoading(false);
-        setFailed(false);
-      });
-
-      wsRef.current.addEventListener(
-        "message",
-        ({ data }: { data: string }) => {
-          const message = JSONToMessage(data);
-          handleServerEvent(message);
-        }
+    const token = getSessionToken();
+    if (token && wsRef.current) {
+      wsRef.current.send(
+        messageToJSON({
+          event: "verifyToken",
+          payload: { token },
+        })
       );
+    }
 
-      wsRef.current.addEventListener("close", () => {
-        reconnect();
-      });
+    updateState({ failed: false, loading: false });
+  }, []);
 
-      wsRef.current.addEventListener("error", () => {
-        handleError(errorCodes["UNEXPECTED_ERROR_TRYING_AGAIN"]);
-      });
-    },
-    [url]
-  );
+  const handleWSMessageEvent = useCallback(({ data }: { data: string }) => {
+    const message = JSONToMessage(data);
+    handleServerEvent(message);
+  }, []);
+
+  const handleWSErrorEvent = useCallback(() => {
+    handleError(errorCodes["UNEXPECTED_ERROR_TRYING_AGAIN"]);
+  }, []);
 
   const reconnect = useCallback(() => {
-    setLoading(true);
-    setFailed(false);
+    updateState({ loading: true, failed: false });
 
     connectionAttemptsRef.current++;
     if (connectionAttemptsRef.current >= MAX_RECCONECTION_ATTEMPTS) {
       handleError(errorCodes["CANT_CONNECT_TO_SERVER"]);
       return;
-    }
+    }  
 
     const timeout = RECONNECT_DELAY * connectionAttemptsRef.current;
-    setTimeout(() => connect(url), timeout);
-  }, []);
+    setTimeout(connect, timeout);
+  }, [connect]);
 
-  const handleServerEvent = (message: ServerEvents) => {
+  const handleServerEvent = useCallback((message: ServerEvents) => {
     const { event, payload } = message;
 
     switch (event) {
@@ -128,7 +123,7 @@ const useChat = (url: string): useChatHookReturnings => {
         handleError(errorCodes["NOT_HANDLED_ERROR"]);
         break;
     }
-  };
+  }, []);
 
   const handleError = useCallback((payload: ErrorEventPayload) => {
     const { code, content } = payload;
@@ -137,11 +132,13 @@ const useChat = (url: string): useChatHookReturnings => {
     const isTokenExpired = payload.code === 104 || payload.code === 108;
 
     toast.error(`ERROR-${code}: ${content}`);
+
     if (isCodeMatched) {
-      setFailed(true);
+      updateState({ failed: true });
     }
+
     if (isTokenExpired) {
-      setAuthenticated(false);
+      updateState({ authenticated: false });
       sessionStorage.removeItem("token");
     }
   }, []);
@@ -157,7 +154,7 @@ const useChat = (url: string): useChatHookReturnings => {
         onlineUsers,
         userData,
       }));
-      setAuthenticated(true);
+      updateState({ authenticated: true });
     },
     []
   );
@@ -212,7 +209,7 @@ const useChat = (url: string): useChatHookReturnings => {
     [handleError]
   );
 
-  return { chatData, authenticated, loading, failed, send: sendMessage };
+  return { chatData, ...state, send: sendMessage };
 };
 
 export default useChat;

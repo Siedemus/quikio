@@ -18,14 +18,14 @@ export type OnlineUser = {
   name: string;
 };
 
-export interface IChatData {
+export interface IUseChatData {
   rooms: Room[];
   onlineUsers: OnlineUser[];
   userData: { userId: number; username: string } | null;
 }
 
 export interface IChatContext {
-  chatData: IChatData | null;
+  chatData: IUseChatData | null;
   sendMessage: (message: ClientEvents) => void;
 }
 
@@ -104,7 +104,7 @@ export type UnsubscribeRoomEvent = {
   payload: UnsubscribeRoomEventPayload;
 };
 
-export type addRoomEvent = {
+export type AddRoomEvent = {
   event: "addRoom";
   payload: Room;
 };
@@ -132,8 +132,8 @@ export type VerifiedTokenEvent = {
   payload: AuthorizedEventPayload;
 };
 
-export type useChatHookReturnings = {
-  chatData: IChatData;
+export type UseChatHookReturnings = {
+  chatData: IUseChatData;
   authenticated: boolean;
   loading: boolean;
   failed: boolean;
@@ -152,6 +152,12 @@ export type ServerEvents =
   | AuthorizedEvent
   | NewMessageEvent
   | NewOnlineUserEvent
-  | addRoomEvent
+  | AddRoomEvent
   | RemoveRoomEvent
   | VerifiedTokenEvent;
+
+export interface IUseChatStateProps {
+  loading: boolean;
+  failed: boolean;
+  authenticated: boolean;
+}
