@@ -1,8 +1,8 @@
 import { createContext, ReactNode } from "react";
-import { useChatHookReturnings } from "../types/types";
+import { UseChatHookReturnings } from "../types/types";
 import useChat from "../hooks/useChat";
 
-export const ChatContext = createContext<useChatHookReturnings | null>(null);
+export const ChatContext = createContext<UseChatHookReturnings | null>(null);
 
 const ChatContextProvider = ({ children }: { children: ReactNode }) => {
   const chat = useChat(import.meta.env.VITE_WSS_URL);
