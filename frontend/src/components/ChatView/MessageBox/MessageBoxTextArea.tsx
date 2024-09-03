@@ -21,8 +21,8 @@ const MessageBoxTextArea = ({
 
   const handleBaseMessage = () => {
     const trimmedValue = value.trim();
-    if (!trimmedValue) {
-      inputRef.current?.focus;
+    if (!trimmedValue && inputRef.current) {
+      inputRef.current.focus();
       toast.warning("You should type something.");
       return;
     }

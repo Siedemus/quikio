@@ -16,7 +16,7 @@ const Search = ({
       <input
         className="border border-hippieBlue rounded-2xl bg-aliceBlue placeholder:text-gray-500 pl-4 py-1 w-full"
         placeholder="Search users or channels..."
-        value={query ? query : ""}
+        value={query || ""}
         onChange={(e) => updateQuery(e.target.value)}
       />
       <button

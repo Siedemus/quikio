@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import regex from "../../resources/regex";
 import { ChatContext } from "../../context/ChatContext";
 
-const LoginForm = ({}: {}) => {
+const LoginForm = () => {
   const { send } = useContext(ChatContext)!;
   const [formData, setFormData] = useState<{
     username: string;

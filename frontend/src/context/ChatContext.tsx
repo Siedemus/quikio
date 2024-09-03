@@ -5,7 +5,7 @@ import useChat from "../hooks/useChat";
 export const ChatContext = createContext<useChatHookReturnings | null>(null);
 
 const ChatContextProvider = ({ children }: { children: ReactNode }) => {
-  const chat = useChat("wss://localhost:8080");
+  const chat = useChat(import.meta.env.VITE_WSS_URL);
 
   return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;
 };

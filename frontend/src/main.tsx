@@ -4,17 +4,19 @@ import App from "./App.tsx";
 import "./index.css";
 import { Toaster } from "sonner";
 
+const ENV = import.meta.env.NODE_ENV;
+
 const RootComponent = () => {
   return (
     <>
       <App />
-      <Toaster richColors closeButton position="top-right"/>
+      <Toaster richColors closeButton position="top-right" />
     </>
   );
 };
 
 createRoot(document.getElementById("root")!).render(
-  process.env.NODE_ENV === "production" ? (
+  ENV === "production" ? (
     <RootComponent />
   ) : (
     <StrictMode>

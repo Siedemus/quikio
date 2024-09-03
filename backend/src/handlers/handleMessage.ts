@@ -27,15 +27,15 @@ export const handleMessage = async (
     case "verifyToken":
       handleTokenVerification(ws, message.payload);
       break;
-    case "authorization":
+    case "authorization": {
       const isValid = validateUserData(message.payload);
       if (!isValid) {
         sendErrorMessage(ws, "VALIDATION_ERROR");
         break;
       }
-
       handleAuthorization(ws, message.payload);
       break;
+    }
     case "base":
       handleBaseMessageEvent(ws, message.payload);
       break;
@@ -97,7 +97,10 @@ const handleAuthorization = async (
   try {
     let user = await getUserByName(inputUser.name);
     if (user) {
-      const passwordMatch = isPasswordMatch(user.password, inputUser.password);
+      const passwordMatch = await isPasswordMatch(
+        user.password,
+        inputUser.password
+      );
       if (!passwordMatch) {
         sendErrorMessage(ws, "PASSWORD_MISMATCH_ERROR");
         return;
