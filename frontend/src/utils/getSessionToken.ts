@@ -1,7 +1,7 @@
 const getSessionToken = () => {
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-  return token
+  return token;
 };
 
 export default getSessionToken;

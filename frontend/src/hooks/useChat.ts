@@ -90,7 +90,7 @@ const useChat = (url: string): UseChatHookReturnings => {
     if (connectionAttemptsRef.current >= MAX_RECCONECTION_ATTEMPTS) {
       handleError(errorCodes["CANT_CONNECT_TO_SERVER"]);
       return;
-    }  
+    }
 
     const timeout = RECONNECT_DELAY * connectionAttemptsRef.current;
     setTimeout(connect, timeout);
@@ -139,14 +139,14 @@ const useChat = (url: string): UseChatHookReturnings => {
 
     if (isTokenExpired) {
       updateState({ authenticated: false });
-      sessionStorage.removeItem("token");
+      localStorage.removeItem("token");
     }
   }, []);
 
   const handleAuthorizedMessage = useCallback(
     (payload: AuthorizedEventPayload) => {
       const { token, rooms, onlineUsers, ...userData } = payload;
-      sessionStorage.setItem("token", token);
+      localStorage.setItem("token", token);
 
       setChatData((prevChatData) => ({
         ...prevChatData,
