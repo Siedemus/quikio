@@ -3,7 +3,7 @@ import * as ws from "ws";
 import { handleMessage } from "./handlers/handleMessage";
 import { JSONToMessage } from "./utils/JSONToMessage";
 import { sendErrorMessage } from "./utils/sendErrorMessage";
-import onlineUsersManager from "./models/onlineUsersManager";
+import ConnectedUsersManager from "./models/ConnectedUsersManager";
 
 const PORT = Number(process.env.PORT) || 10000;
 const HOST = process.env.HOST || "0.0.0.0";
@@ -27,11 +27,11 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("error", () => {
-    onlineUsersManager.removeUser(ws);
+    ConnectedUsersManager.removeUserConnection(ws);
   });
 
   ws.on("close", () => {
-    onlineUsersManager.removeUser(ws);
+    ConnectedUsersManager.removeUserConnection(ws);
   });
 });
 
