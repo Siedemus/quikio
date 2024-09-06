@@ -1,14 +1,10 @@
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-} from "react-router-dom";
+import { createHashRouter, Navigate, RouterProvider } from "react-router-dom";
 import ChatContextProvider from "./context/ChatContext";
 import AuthWrapper from "./components/common/AuthWrapper";
 import ChatView from "./components/ChatView/ChatView";
 import LoginForm from "./components/LoginForm/LoginForm";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/chat",
     element: (
