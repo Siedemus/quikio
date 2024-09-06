@@ -41,4 +41,8 @@ export const errorCodes = {
     content:
       "Your token is probably expired or provided data is not matching token data.",
   },
+  ALREADY_ESTABLISHED: {
+    code: 109,
+    content: "Sorry, but this WebSocket connection is established.",
+  },
 };

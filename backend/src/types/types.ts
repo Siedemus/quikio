@@ -21,8 +21,8 @@ export type OnlineUser = {
   name: string;
 };
 
-export type OnlineUserSocket = OnlineUser & {
-  ws: ws.WebSocket;
+export type ConnectedUser = OnlineUser & {
+  ws: ws.WebSocket[];
 };
 
 export type AuthorizationEventPayload = {
